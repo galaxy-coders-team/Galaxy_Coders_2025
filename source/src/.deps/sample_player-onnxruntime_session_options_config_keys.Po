@@ -1,0 +1,8 @@
+sample_player-onnxruntime_session_options_config_keys.o: \
+ onnxruntime/include/onnxruntime_session_options_config_keys.cpp \
+ /usr/include/stdc-predef.h \
+ onnxruntime/include/onnxruntime_session_options_config_keys.h
+
+/usr/include/stdc-predef.h:
+
+onnxruntime/include/onnxruntime_session_options_config_keys.h:

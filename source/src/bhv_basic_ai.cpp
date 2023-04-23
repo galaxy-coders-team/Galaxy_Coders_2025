@@ -51,7 +51,7 @@ bool bhv_basic_ai::execute(rcsc::PlayerAgent* agent )
     state state;
     state.get_state(agent);
     
-    if(std::abs(state.Angle_from_goal) > 20)
+    if(wm.self().angleFromBall().abs() > 20)
     {
         
     }

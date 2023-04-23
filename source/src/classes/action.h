@@ -39,9 +39,7 @@ public:
     
     /*
     kick  = 0
-    turn  = 1
-    takle = 2
-    dash = 3
+    move  = 1
     */
     
     void get_action(double Direction, double Power, int at); // get action params

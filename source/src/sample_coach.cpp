@@ -52,7 +52,7 @@
 #include <iostream>
 #include <functional>
 
-#include "Galaxy_Coders_logo.xpm"
+#include "team_logo.xpm"
 
 using namespace rcsc;
 

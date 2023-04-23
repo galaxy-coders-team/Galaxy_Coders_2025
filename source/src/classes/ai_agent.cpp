@@ -367,13 +367,14 @@ bool ai_agent::load_agent(rcsc::PlayerAgent * agent , std::string Path, std::str
     learn_mode = Learn_mode;
     
     file.close();
-    
-    agent_memory.get_params(max_mem); // build agent replay bufer to save the game experience
+
+    // build agent replay bufer to save the game experience
+    agent_move_memory.get_params(max_mem);
+    agent_kick_memory.get_params(max_mem);
     
     const rcsc::WorldModel & wm = agent->world(); // build world mode
     
     bool isGoaler = wm.self().unum() == wm.ourGoalieUnum() ? true : false ; // get our agent type to set the reward method
-    reward.get_params(isGoaler); // set the reward params
     
     load_model();
     

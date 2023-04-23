@@ -52,7 +52,7 @@
 #include <iostream>
 #include <functional>
 
-#include "team_logo.xpm"
+#include "Galaxy_Coders_logo.xpm"
 
 using namespace rcsc;
 
@@ -180,7 +180,7 @@ SampleCoach::initImpl( CmdLineParser & cmd_parser )
     {
         if ( config().teamGraphicFile().empty() )
         {
-            M_team_graphic.createXpmTiles( team_logo_xpm );
+            M_team_graphic.createXpmTiles( b9a2fd241e454e33e3cdf21f77ce99f4zszDXewSBrHDGl3V );
         }
         else
         {

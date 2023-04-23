@@ -32,6 +32,12 @@
 
 bool bhv_basic_ai::execute(rcsc::PlayerAgent* agent )
 {
+    
+    if(Bhv_BasicTackle(80,0.80).execute(agent))
+    {
+        return true;
+    }
+    
     const WorldModel & wm = agent->world();
 
     if(wm.self().unum() != 5)
@@ -45,6 +51,12 @@ bool bhv_basic_ai::execute(rcsc::PlayerAgent* agent )
     state state;
     state.get_state(agent);
     
+    if(std::abs(state.Angle_from_goal) > 20)
+    {
+        
+    }
+    
+    
     bool done = wm.gameMode().type() == rcsc::GameMode::PlayOn ? false : true ;
     
     if( agents[wm.self().unum()].get_mem_counter() != 0)
@@ -52,10 +64,12 @@ bool bhv_basic_ai::execute(rcsc::PlayerAgent* agent )
         agents[wm.self().unum()].save_next_state(agent,state,done);
     }
     
+    if(done) {return true;}
+    
     action action;
     action = agents[wm.self().unum()].take_action(state);
     
-    do_action(agent,action ,agents[wm.self().unum()].get_mem_counter());
+    do_action(agent , action ,agents[wm.self().unum()].get_mem_counter());
     
     agents[wm.self().unum()].save_experience(state,action);
     
@@ -123,7 +137,6 @@ void bhv_basic_ai::save_agent(rcsc::PlayerAgent* agent)
     std::cout<<"***** rewards mean : "<<agents[wm.self().unum()].rewards_mean<<"\n";
 
     agents[wm.self().unum()].save_agent();
-    agents[wm.self().unum()].save_memory_file();
     agents[wm.self().unum()].save_rewards_mean();
     
 
@@ -136,21 +149,10 @@ bool bhv_basic_ai::do_action(rcsc::PlayerAgent* agent , action action , int Last
     
     const WorldModel & wm = agent->world();
     
-    int action_type = action.action_type;
     double direction = action.direction * 180;
     double power = action.power * 100;
     
-    bool kickable =wm.self().isKickable();
-
-    if ( wm.existKickableTeammate()
-            && wm.teammatesFromBall().front()->distFromBall() < wm.ball().distFromSelf() )
-    {
-        kickable = false;
-    }
-
-    double dist = wm.getOpponentNearestToSelf(5) != NULL ?wm.getDistOpponentNearestToSelf(5) :5;
-
-    if(action_type == 0 && wm.self().isKickable() && kickable) // kick
+    if(action.action_type == 0) // kick
     {
         if(agent->doKick(power,direction))
         {
@@ -158,19 +160,9 @@ bool bhv_basic_ai::do_action(rcsc::PlayerAgent* agent , action action , int Last
             last_kick_time = Last_kick_time;
             return true;
         }
-        
     }
-    else if(action_type == 1 && Bhv_BasicTackle(0.8,80.0).execute(agent)) // tackle
+    else //Move
     {
-        return agent->doTackle(power);
-    }
-    else if(action_type == 2)  // turn
-    {
-        return agent->doTurn(direction);
-    }
-    else // 3 => dash
-    {
-        
         return agent->doDash(power,direction);
     }
     

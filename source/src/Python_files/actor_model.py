@@ -23,7 +23,6 @@ class ActorNetwork(keras.Model):
         self.base_4 = Dense(200, activation="relu")
 
         # output
-        self.action_type = Dense(4)  # 0:kick  , 1:tackle , 2:turn , 3:move
         self.direction   = Dense(1, activation="tanh")     # otp=[-1,1]
         self.power       = Dense(1, activation="sigmoid")  # otp=[0,1]
         
@@ -36,13 +35,9 @@ class ActorNetwork(keras.Model):
         x = self.base_4(x)
 
         # get outputs white base value
-        
-        action_type = tf.math.argmax(self.action_type(x), axis=1)
-        action_type = tf.convert_to_tensor( [action_type] , dtype=tf.float32 )
-        action_type = tf.reshape(action_type,[-1,1])
         direction = self.direction(x)
         power = self.power(x)
 
-        output = tf.concat([action_type,direction,power ], axis=1)
+        output = tf.concat([direction,power], axis=1)
 
         return output # action_type , direction , power

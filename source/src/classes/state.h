@@ -31,14 +31,13 @@ class state
 {
 public:
     
-    uint32_t state_dims = 58;
+    int game_mode;
+    
+    uint32_t state_dims = 54;
 
     Vector2D self_pos;
     Vector2D ball_pos;
     Vector2D goal_pos;
-
-    double Angle_from_goal;
-    double Angle_from_ball;
     
     double speed;
     double stamina;
@@ -48,7 +47,6 @@ public:
     double dist_from_goal;
     
     bool is_kickable;
-    bool is_tacklable;
     bool exist_kickable_teammate;
 
     Vector2D tm_pos[10];

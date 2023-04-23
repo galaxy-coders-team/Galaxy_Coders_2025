@@ -68,13 +68,14 @@ private:
     
     bool use_model = true;
     
+    bool last_state_is_move = true;
     
-    
-    replay_bufer agent_memory; // agent replay  bufer
-    
+    replay_bufer agent_move_memory; // agent_Move replay  bufer
+    replay_bufer agent_kick_memory; // agent_Move replay  bufer
 
     
-    galaxy_ann model;
+    galaxy_ann move_model;
+    galaxy_ann kick_model;
     
 public:
     
@@ -100,7 +101,7 @@ public:
     
     action take_action(state State); // tack action from ann or generate random action 
     
-    void save_memory_file(); // save the game experience (agent replay bufer) in .csv file
+    void save_memory_file(std::string part ,std::vector<memory> data); // save the game experience (agent replay bufer) in .csv file
     
     void load_model();
     

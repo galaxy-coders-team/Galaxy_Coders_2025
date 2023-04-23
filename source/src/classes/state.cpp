@@ -27,13 +27,17 @@ void state::get_state(rcsc::PlayerAgent* agent)
 
     const rcsc::WorldModel & wm = agent->world();
 
+    game_mode = 0;
+    if(wm.gameMode().type() == rcsc::GameMode::AfterGoal_)
+    {
+        if(wm.gameMode().side() == wm.ourSide()) { game_mode =  1; }
+        else                                     { game_mode = -1; }
+    }
+    
     self_pos = wm.self().pos();
 
     goal_pos = middle_goal_pos - self_pos;
     ball_pos = wm.ball().pos() - self_pos;
-
-    Angle_from_goal = (middle_goal_pos - wm.self().pos()).th().degree();
-    Angle_from_ball = wm.self().angleFromBall().degree() ;
 
     speed = wm.self().speed();
     stamina = wm.self().stamina();
@@ -41,9 +45,6 @@ void state::get_state(rcsc::PlayerAgent* agent)
 
     dist_from_ball = wm.self().distFromBall();
     dist_from_goal = wm.self().pos().dist(middle_goal_pos);
-
-
-    is_tacklable = Bhv_BasicTackle( 0.8, 80.0 ).execute(agent);
 
     bool kickable =wm.self().isKickable();
 
@@ -99,9 +100,6 @@ void state::normalize_state()
     ball_pos.x /= 52.5;
     ball_pos.y /= 34;
 
-    Angle_from_ball /= 180;
-    Angle_from_goal /= 180;
-
     //speed is alredy normalized
     stamina /= 8000;
     stamina_capacity /= 130600;
@@ -129,9 +127,6 @@ void state::empty_state()
     ball_pos.x = 0;
     ball_pos.y = 0;
 
-    Angle_from_goal = 0;
-    Angle_from_ball = 0 ;
-
     speed = 0;
     stamina = 0;
     stamina_capacity = 0;
@@ -139,7 +134,6 @@ void state::empty_state()
     dist_from_ball = 0;
     dist_from_goal = 0;
 
-    is_tacklable = false;
     is_kickable = false;
     exist_kickable_teammate = false;
 
@@ -162,9 +156,6 @@ void state::operator=(state state)
     goal_pos = state.goal_pos;
     ball_pos = state.ball_pos;
 
-    Angle_from_goal = state.Angle_from_goal;
-    Angle_from_ball = state.Angle_from_ball ;
-
     speed = state.speed;
     stamina = state.stamina;
     stamina_capacity = state.stamina_capacity;
@@ -172,7 +163,6 @@ void state::operator=(state state)
     dist_from_ball = state.dist_from_ball;
     dist_from_goal = state.dist_from_goal;
 
-    is_tacklable = state.is_tacklable;
     is_kickable = state.is_kickable;
     exist_kickable_teammate = state.exist_kickable_teammate;
 
@@ -193,21 +183,18 @@ std::string state::to_string()
 
     std::string data = "";
 
+    data += std::to_string(is_kickable      * 100) ; data += "," ;
     data += std::to_string(self_pos.x       * 100) ; data += "," ;
     data += std::to_string(self_pos.y       * 100) ; data += "," ;
     data += std::to_string(ball_pos.x       * 100) ; data += "," ;
     data += std::to_string(ball_pos.y       * 100) ; data += "," ;
     data += std::to_string(goal_pos.x       * 100) ; data += "," ;
     data += std::to_string(goal_pos.y       * 100) ; data += "," ;
-    data += std::to_string(Angle_from_goal  * 100) ; data += "," ;
-    data += std::to_string(Angle_from_ball  * 100) ; data += "," ;
     data += std::to_string(speed            * 100) ; data += "," ;
     data += std::to_string(stamina          * 100) ; data += "," ;
     data += std::to_string(stamina_capacity * 100) ; data += "," ;
     data += std::to_string(dist_from_ball   * 100) ; data += "," ;
     data += std::to_string(dist_from_goal   * 100) ; data += "," ;
-    data += std::to_string(is_tacklable     * 100) ; data += "," ;
-    data += std::to_string(is_kickable      * 100) ; data += "," ;
     data += std::to_string(exist_kickable_teammate * 100) ; data += ",";
 
     for(int i = 0; i< 10 ; i++)
@@ -231,11 +218,11 @@ std::vector<double> state::to_array()
         (double)self_pos.x ,(double)self_pos.y ,
         (double)ball_pos.x ,(double)ball_pos.y ,
         (double)goal_pos.x ,(double)goal_pos.y ,
-        (double)Angle_from_ball ,(double)Angle_from_goal ,
         (double)speed,
         (double)stamina ,(double)stamina_capacity ,
         (double)dist_from_ball ,(double)dist_from_goal ,
-        (double)is_tacklable ,(double)is_kickable , (double)exist_kickable_teammate,
+        //(double)is_kickable , 
+        (double)exist_kickable_teammate,
 
         (double)tm_pos[0].x  ,(double)tm_pos[0].y ,
         (double)tm_pos[1].x  ,(double)tm_pos[1].y ,
@@ -262,7 +249,7 @@ std::vector<double> state::to_array()
 
     };
 
-    state_dims = 58;
+    state_dims = 54;
 
     return array;
 }

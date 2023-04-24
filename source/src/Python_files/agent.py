@@ -13,6 +13,7 @@ from colorama import Fore
 from actor_model import ActorNetwork
 from critic_model import CriticNetwork
 
+import random
 import numpy as np
 import pandas as pd
 
@@ -44,7 +45,8 @@ class Agent:
         self.kick_actor  = ActorNetwork()
         self.critic = CriticNetwork()
         
-        self.target_actor  = ActorNetwork()
+        self.target_move_actor  = ActorNetwork()
+        self.target_kick_actor  = ActorNetwork()
         self.target_critic = CriticNetwork()
         
         #compile models
@@ -100,25 +102,37 @@ class Agent:
         rewards     = pd.read_csv(self.move_memory_path + "rewards/"     + self.name + "_rewards.csv"     ,header = None).to_numpy(dtype=np.float64)
         next_states = pd.read_csv(self.move_memory_path + "next_states/" + self.name + "_next_states.csv" ,header = None).to_numpy(dtype=np.float64)
         dones        = pd.read_csv(self.move_memory_path + "done/"        + self.name + "_done_memory.csv" ,header = None).to_numpy(dtype=np.float64)
-        
-        # convert to tensor
-        states      = tf.convert_to_tensor(states      , dtype=tf.float32)
-        actions     = tf.convert_to_tensor(actions     , dtype=tf.float32)
-        next_states = tf.convert_to_tensor(next_states , dtype=tf.float32)
-        rewards     = tf.convert_to_tensor(rewards     , dtype=tf.float32)
-        
+
+        states = tf.convert_to_tensor(states, dtype=tf.float32)
+        actions = tf.convert_to_tensor(actions, dtype=tf.float32)
+        next_states = tf.convert_to_tensor(next_states, dtype=tf.float32)
+        rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
+        dones = tf.convert_to_tensor(dones, dtype=tf.float32)
+
         states      /= 100 
         actions     /= 100
         next_states /= 100
         rewards     /= 100
 
-        batch = np.random.choice(mem_size, self.batch_size)
+        state      = []
+        action     = []
+        next_state = []
+        reward     = []
+        done       = []
 
-        state      = states[batch] 
-        action     = actions[batch]
-        next_state = next_states[batch]
-        reward     = rewards[batch]
-        done       = done[batch]
+        for a in range(0, self.batch_size):
+            index = random.randint(0, mem_size - 1)
+            state.append(states[index])
+            action.append(actions[index])
+            next_state.append(next_states[index])
+            reward.append(rewards[index])
+            done.append(dones[index])
+
+        state = tf.convert_to_tensor(state, dtype=tf.float32)
+        action = tf.convert_to_tensor(action, dtype=tf.float32)
+        next_state = tf.convert_to_tensor(next_state, dtype=tf.float32)
+        reward = tf.convert_to_tensor(reward, dtype=tf.float32)
+        done = tf.convert_to_tensor(done, dtype=tf.float32)
 
         return state, action, reward, next_state, done
     
@@ -133,26 +147,37 @@ class Agent:
         rewards     = pd.read_csv(self.kick_memory_path + "rewards/"     + self.name + "_rewards.csv"     ,header = None).to_numpy(dtype=np.float64)
         next_states = pd.read_csv(self.kick_memory_path + "next_states/" + self.name + "_next_states.csv" ,header = None).to_numpy(dtype=np.float64)
         dones       = pd.read_csv(self.kick_memory_path + "done/"        + self.name + "_done_memory.csv" ,header = None).to_numpy(dtype=np.float64)
-        
-        # convert to tensor
-        states      = tf.convert_to_tensor(states      , dtype=tf.float32)
-        actions     = tf.convert_to_tensor(actions     , dtype=tf.float32)
-        next_states = tf.convert_to_tensor(next_states , dtype=tf.float32)
-        rewards     = tf.convert_to_tensor(rewards     , dtype=tf.float32)
-        dones       = tf.convert_to_tensor(dones       , dtype=tf.float32)
-        
+
+        states = tf.convert_to_tensor(states, dtype=tf.float32)
+        actions = tf.convert_to_tensor(actions, dtype=tf.float32)
+        next_states = tf.convert_to_tensor(next_states, dtype=tf.float32)
+        rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
+        dones = tf.convert_to_tensor(dones, dtype=tf.float32)
+
         states      /= 100 
         actions     /= 100
         next_states /= 100
         rewards     /= 100
 
-        batch = np.random.choice(mem_size, self.batch_size)
+        state = []
+        action = []
+        next_state = []
+        reward = []
+        done = []
 
-        state      = states[batch] 
-        action     = actions[batch]
-        next_state = next_states[batch]
-        reward     = rewards[batch]
-        done       = done[batch]
+        for a in range(0, self.batch_size):
+            index = random.randint(0, mem_size - 1)
+            state.append(states[index])
+            action.append(actions[index])
+            next_state.append(next_states[index])
+            reward.append(rewards[index])
+            done.append(dones[index])
+
+        state = tf.convert_to_tensor(state, dtype=tf.float32)
+        action = tf.convert_to_tensor(action, dtype=tf.float32)
+        next_state = tf.convert_to_tensor(next_state, dtype=tf.float32)
+        reward = tf.convert_to_tensor(reward, dtype=tf.float32)
+        done = tf.convert_to_tensor(done, dtype=tf.float32)
 
         return state, action, reward, next_state, done
 
@@ -183,12 +208,13 @@ class Agent:
         
         data.to_csv(agents_path + self.name + '_data.csv')
 
-    def move_update_network_parameters(self, tau=None):
-        if tau is None:
-            tau = self.soft_update_rate
+    def move_update_network_parameters(self):
+
+        tau = self.soft_update_rate
 
         weights = []
         targets = self.target_move_actor.weights
+
         for i, weight in enumerate(self.move_actor.weights):
             weights.append(weight * tau + targets[i] * (1 - tau))
         self.target_move_actor.set_weights(weights)
@@ -219,7 +245,7 @@ class Agent:
         
         # get our data
         states , actions , rewards , states_ , done =             self.read_move_memory_file()
-        
+
         with tf.GradientTape() as tape:
             target_actions = self.target_move_actor(states_)
             critic_value_ = tf.squeeze(self.target_critic(
@@ -278,10 +304,11 @@ class Agent:
         self.kick_update_network_parameters()
 
     def learn(self):
-        df = pd.read_csv(self.move_memory_path + "states/"      + self.name + "_states.csv"      ,header = None).to_numpy(dtype=np.float64)
+
+        df = pd.read_csv(self.move_memory_path + "states/"      + self.name + "_states.csv"      ,header = None)
         if(df.shape[1] > self.batch_size * 10):
             self.move_learn()
 
-        df = pd.read_csv(self.kick_memory_path + "states/"      + self.name + "_states.csv"      ,header = None).to_numpy(dtype=np.float64)
-        if(df.shape[1] > self.batch_size * 10):
-            self.kick_learn()
+        #df = pd.read_csv(self.kick_memory_path + "states/"      + self.name + "_states.csv"      ,header = None)
+        #if(df.shape[1] > self.batch_size * 10):
+            #self.kick_learn()

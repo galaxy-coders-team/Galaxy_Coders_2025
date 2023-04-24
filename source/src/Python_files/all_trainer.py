@@ -10,14 +10,28 @@ def save_csv(agent , path):
     index = 0
     weights_index = 0
     bias_index = 0
-    for i in agent.actor.weights:
+    for i in agent.move_actor.weights:
         if(index % 2 == 0):
-            np.savetxt(path + "models_weights/" +agent.name +"_"+ str(weights_index) +"_weights.csv", i.numpy() , delimiter=",")
+            np.savetxt(path + "models_weights/move_model/" +agent.name +"_"+ str(weights_index) +"_weights.csv", i.numpy() , delimiter=",")
             weights_index += 1
         else:
-            np.savetxt(path + "models_weights/" +agent.name +"_"+ str(bias_index) +"_bias.csv", i.numpy() , delimiter=",")
+            np.savetxt(path + "models_weights/move_model/" +agent.name +"_"+ str(bias_index) +"_bias.csv", i.numpy() , delimiter=",")
             bias_index += 1
         index +=1
+
+    index = 0
+    weights_index = 0
+    bias_index = 0
+    for i in agent.kick_actor.weights:
+        if (index % 2 == 0):
+            np.savetxt(path + "models_weights/kick_model/" + agent.name + "_" + str(weights_index) + "_weights.csv",
+                       i.numpy(), delimiter=",")
+            weights_index += 1
+        else:
+            np.savetxt(path + "models_weights/kick_model/" + agent.name + "_" + str(bias_index) + "_bias.csv",
+                       i.numpy(), delimiter=",")
+            bias_index += 1
+        index += 1
         
     print(Fore.GREEN + "..." + agent.name+" weights saved successfully..."+Fore.WHITE)
     
@@ -32,6 +46,7 @@ def trainer(names,path , load):
             agents[i].load_model()
 
         agents[i].learn()
+        agents[i].save_model()
         save_csv(agents[i],path)
         
 if __name__ == '__main__':
@@ -46,11 +61,3 @@ if __name__ == '__main__':
     if(sys.argv[2] != ''):
         path_r = sys.argv[2]
         trainer(names,path_r , load)
-       
-
-    
-    
-       
-    
-    
-

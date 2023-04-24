@@ -16,10 +16,6 @@ from critic_model import CriticNetwork
 import numpy as np
 import pandas as pd
 
-
-# In[2]:
-
-
 class Agent:
     def __init__(self, name = "agent" , files_path = "data/" , max_mem = 3000 , 
                  batch_size = 64 , epsilon = 0.05 , eps_decay = 0.98 , eps_min = 0.005 , gamma = 0.98,
@@ -74,12 +70,12 @@ class Agent:
         self.gamma            = agent_data.gamma[0]
         
         #compile models with new data
-        self.move_actor.compile  ( optimizer = Adam( learning_rate = learning_rate_alpha ))
-        self.kick_actor.compile  ( optimizer = Adam( learning_rate = learning_rate_alpha ))
+        self.move_actor.compile  ( optimizer = Adam( learning_rate = agent_data.learning_rate_alpha[0] ))
+        self.kick_actor.compile  ( optimizer = Adam( learning_rate = agent_data.learning_rate_alpha[0] ))
         self.critic.compile ( optimizer = Adam( learning_rate = agent_data.learning_rate_beta[0]  ))
         
-        self.target_move_actor.compile  ( optimizer = Adam( learning_rate = learning_rate_alpha ))
-        self.target_kick_actor.compile  ( optimizer = Adam( learning_rate = learning_rate_alpha ))
+        self.target_move_actor.compile  ( optimizer = Adam( learning_rate = agent_data.learning_rate_alpha[0] ))
+        self.target_kick_actor.compile  ( optimizer = Adam( learning_rate = agent_data.learning_rate_alpha[0] ))
         self.target_critic.compile ( optimizer=Adam( learning_rate = agent_data.learning_rate_beta[0]  ))
         
     def load_model(self):
@@ -267,3 +263,12 @@ class Agent:
             actor_network_gradient, self.kick_actor.trainable_variables))
 
         self.kick_update_network_parameters()
+
+    def learn(self):
+        df = pd.read_csv(self.move_memory_path + "states/"      + self.name + "_states.csv"      ,header = None).to_numpy(dtype=np.float64)
+        if(df.shape[1] > self.batch_size * 10):
+            self.move_learn()
+
+        df = pd.read_csv(self.kick_memory_path + "states/"      + self.name + "_states.csv"      ,header = None).to_numpy(dtype=np.float64)
+        if(df.shape[1] > self.batch_size * 10):
+            self.kick_learn()

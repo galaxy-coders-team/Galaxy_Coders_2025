@@ -157,19 +157,16 @@ action ai_agent::take_action(state State)
         random_num = get_random_num(0,1,false); // generate random number between 0 and 1
     }
     
-     int action_type = 0;
+     int action_type = State.is_kickable ? 0 : 1 ;
      double direction = 0;
      double power = 0;
      
     if(random_num < epsilon) // creat random action
     {
 
-        action_type = (int)get_random_num(0,4,true);
-
        direction = get_random_num(-1 , 1 , false);
        power = get_random_num( 0 , 1 , false);
        
-       action.get_action(direction,power,action_type);
     }
     else //take action using ann
     {
@@ -186,11 +183,12 @@ action ai_agent::take_action(state State)
             output = move_model.predict(model_input);
         }
     
-        action.action_type = State.is_kickable ? 0 : 1 ;
-        action.direction = output[1] ;
-        action.power = output[2] ;
+        direction = output[1] ;
+        power = output[2] ;
     }
     
+
+    action.get_action(direction,power,action_type);
     
     if(learn_mode == true)
     {
@@ -216,27 +214,16 @@ void ai_agent::save_memory_file(std::string part ,std::vector<memory> data)
      if(learn_mode == false)
     { return; }
     
-    if(data.size() != batch_size)
-    { return; }
-    
     //creat files
-    std::ofstream state_file(  path + part +"memory/" + "states/" + name + "_states.csv" , std::ios_base::app); 
-    std::ofstream action_file( path + part +"memory/"+ "actions/" + name + "_actions.csv", std::ios_base::app); 
-    std::ofstream reward_file( path + part +"memory/" + "rewards/" + name + "_rewards.csv", std::ios_base::app); 
+    std::ofstream state_file(  path + part +"memory/" + "states/" + name + "_states.csv" , std::ios_base::app);
+    std::ofstream action_file( path + part +"memory/"+ "actions/" + name + "_actions.csv", std::ios_base::app);
+    std::ofstream reward_file( path + part +"memory/" + "rewards/" + name + "_rewards.csv", std::ios_base::app);
     std::ofstream next_state_file( path + part + "memory/" + "next_states/" + name + "_next_states.csv", std::ios_base::app);
-    std::ofstream done_file( path + part +"memory/" + "done/" + name + "_done_memory.csv", std::ios_base::app); 
-    
-    
+    std::ofstream done_file( path + part +"memory/" + "done/" + name + "_done_memory.csv", std::ios_base::app);
     
     if(state_file.is_open() && action_file.is_open() 
           && reward_file.is_open() && next_state_file.is_open() && done_file.is_open())
     {
-        //state_file <<" 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57,58\n" ;
-        //reward_file << "Rewards \n";
-        //action_file << "action_type,direction,power \n";
-        //next_state_file <<" 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57,58\n" ;
-        //done_file<<"done \n";
-
         for(int i = 0 ; i < data.size() ; i++)
         {
             
@@ -313,8 +300,8 @@ void ai_agent::save_agent()
     std::vector<memory> move_data = agent_move_memory.get_memory(),
                         kick_data = agent_kick_memory.get_memory();
                         
-    save_memory_file("move",move_data);
-    save_memory_file("kick",kick_data);
+    save_memory_file("move_",move_data);
+    save_memory_file("kick_",kick_data);
 }
 
 bool ai_agent::load_agent(rcsc::PlayerAgent * agent , std::string Path, std::string Name , bool Learn_mode)

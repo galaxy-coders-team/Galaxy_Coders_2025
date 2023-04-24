@@ -443,8 +443,25 @@ sample_player-bhv_basic_ai.o: bhv_basic_ai.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/bits/locale_conv.h \
  /usr/include/c++/11/bits/quoted_string.h /usr/include/c++/11/sstream \
  /usr/include/c++/11/bits/sstream.tcc classes/state.h classes/action.h \
- classes/galaxy_ann.h classes/matrix.h sample_player.h communication.h \
- bhv_basic_tackle.h \
+ classes/galaxy_ann.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/basic_actions.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/arm_off.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/arm_point_to_point.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/bhv_body_neck_to_point.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/bhv_body_neck_to_ball.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/bhv_neck_body_to_point.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/bhv_neck_body_to_ball.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/body_tackle_to_point.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/body_turn_to_angle.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/body_turn_to_ball.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/body_turn_to_point.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/neck_turn_to_ball.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/neck_turn_to_point.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/neck_turn_to_relative.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/view_change_width.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/view_wide.h \
+ /usr/local/StarterLibRCSC/include/rcsc/action/view_normal.h \
+ classes/matrix.h sample_player.h communication.h bhv_basic_tackle.h \
  /usr/local/StarterLibRCSC/include/rcsc/geom/voronoi_diagram.h \
  /usr/local/StarterLibRCSC/include/rcsc/geom/voronoi_diagram_original.h \
  /usr/local/StarterLibRCSC/include/rcsc/geom/ray_2d.h \
@@ -976,6 +993,23 @@ classes/matrix.h:
 classes/state.h:
 classes/action.h:
 classes/galaxy_ann.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/basic_actions.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/arm_off.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/arm_point_to_point.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/bhv_body_neck_to_point.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/bhv_body_neck_to_ball.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/bhv_neck_body_to_point.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/bhv_neck_body_to_ball.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/body_tackle_to_point.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/body_turn_to_angle.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/body_turn_to_ball.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/body_turn_to_point.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/neck_turn_to_ball.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/neck_turn_to_point.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/neck_turn_to_relative.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/view_change_width.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/view_wide.h:
+/usr/local/StarterLibRCSC/include/rcsc/action/view_normal.h:
 classes/matrix.h:
 sample_player.h:
 communication.h:

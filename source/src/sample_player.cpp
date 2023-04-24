@@ -469,6 +469,9 @@ SamplePlayer::doPreprocess()
     if ( wm.gameMode().type() == GameMode::BeforeKickOff
     || wm.gameMode().type() == GameMode::AfterGoal_ )
     {
+        ai_agent a;
+        s.assign(a.get_random_num(-50,-10,false),a.get_random_num(-30,30,false));
+
         if(wm.gameMode().type() == GameMode::BeforeKickOff && wm.self().unum() != 1 && wm.time().cycle() < 1)
         {
             bhv_basic_ai().load_agent(this ,learn_mode ,read_from_file);
@@ -514,7 +517,7 @@ SamplePlayer::doPreprocess()
         return true;
     }
     
-    if(wm.self().unum() != 1 && wm.time().cycle() > 5000)
+    if(wm.self().unum() != 1 && wm.time().cycle() > 4000)
         {
             bhv_basic_ai().save_agent(this);
         }

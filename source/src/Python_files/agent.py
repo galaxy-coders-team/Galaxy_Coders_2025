@@ -92,11 +92,14 @@ class Agent:
     def read_move_memory_file(self):
         
         #read csv_files                              
-        states      = pd.read_csv(self.move_memory_path + "states/"      + self.name + "_states.csv"      ,header = None).to_numpy(dtype=np.float64)
+        states      = pd.read_csv(self.move_memory_path + "states/"      + self.name + "_states.csv"      ,header = None)
+        mem_size = states.shape[1]
+        states.to_numpy(dtype=np.float64)
+
         actions     = pd.read_csv(self.move_memory_path + "actions/"     + self.name + "_actions.csv"     ,header = None).to_numpy(dtype=np.float64)
         rewards     = pd.read_csv(self.move_memory_path + "rewards/"     + self.name + "_rewards.csv"     ,header = None).to_numpy(dtype=np.float64)
         next_states = pd.read_csv(self.move_memory_path + "next_states/" + self.name + "_next_states.csv" ,header = None).to_numpy(dtype=np.float64)
-        done        = pd.read_csv(self.move_memory_path + "done/"        + self.name + "_done_memory.csv" ,header = None).to_numpy(dtype=np.float64)
+        dones        = pd.read_csv(self.move_memory_path + "done/"        + self.name + "_done_memory.csv" ,header = None).to_numpy(dtype=np.float64)
         
         # convert to tensor
         states      = tf.convert_to_tensor(states      , dtype=tf.float32)
@@ -108,17 +111,28 @@ class Agent:
         actions     /= 100
         next_states /= 100
         rewards     /= 100
-        
-        return states, actions, rewards, next_states, done
+
+        batch = np.random.choice(mem_size, self.batch_size)
+
+        state      = states[batch] 
+        action     = actions[batch]
+        next_state = next_states[batch]
+        reward     = rewards[batch]
+        done       = done[batch]
+
+        return state, action, reward, next_state, done
     
-    def read_move_memory_file(self):
+    def read_kick_memory_file(self):
         
         #read csv_files                              
-        states      = pd.read_csv(self.move_memory_path + "states/"      + self.name + "_states.csv"      ,header = None).to_numpy(dtype=np.float64)
-        actions     = pd.read_csv(self.move_memory_path + "actions/"     + self.name + "_actions.csv"     ,header = None).to_numpy(dtype=np.float64)
-        rewards     = pd.read_csv(self.move_memory_path + "rewards/"     + self.name + "_rewards.csv"     ,header = None).to_numpy(dtype=np.float64)
-        next_states = pd.read_csv(self.move_memory_path + "next_states/" + self.name + "_next_states.csv" ,header = None).to_numpy(dtype=np.float64)
-        dones       = pd.read_csv(self.move_memory_path + "done/"        + self.name + "_done_memory.csv" ,header = None).to_numpy(dtype=np.float64)
+        states      = pd.read_csv(self.kick_memory_path + "states/"      + self.name + "_states.csv"      ,header = None)
+        mem_size = states.shape[1]
+        states.to_numpy(dtype=np.float64)
+
+        actions     = pd.read_csv(self.kick_memory_path + "actions/"     + self.name + "_actions.csv"     ,header = None).to_numpy(dtype=np.float64)
+        rewards     = pd.read_csv(self.kick_memory_path + "rewards/"     + self.name + "_rewards.csv"     ,header = None).to_numpy(dtype=np.float64)
+        next_states = pd.read_csv(self.kick_memory_path + "next_states/" + self.name + "_next_states.csv" ,header = None).to_numpy(dtype=np.float64)
+        dones       = pd.read_csv(self.kick_memory_path + "done/"        + self.name + "_done_memory.csv" ,header = None).to_numpy(dtype=np.float64)
         
         # convert to tensor
         states      = tf.convert_to_tensor(states      , dtype=tf.float32)
@@ -131,17 +145,16 @@ class Agent:
         actions     /= 100
         next_states /= 100
         rewards     /= 100
-        
-        state      = [] 
-        action     = []
-        next_state = []
-        reward     = []
-        done       = []
 
-        #for i in range(0,self.batch_size):
-        #    index = randint(0, )
+        batch = np.random.choice(mem_size, self.batch_size)
 
-        return states, actions, rewards, next_states, done
+        state      = states[batch] 
+        action     = actions[batch]
+        next_state = next_states[batch]
+        reward     = rewards[batch]
+        done       = done[batch]
+
+        return state, action, reward, next_state, done
 
     def save_model(self):
         print(Fore.GREEN+'... saving (' + self.name +') models ...'+Fore.WHITE)

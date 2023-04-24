@@ -55,6 +55,8 @@ private:
 public:
     
     inline static ai_agent agents[12];
+    inline static int unum ;
+    
     //typedef
     
     bhv_basic_ai(){}
@@ -76,6 +78,7 @@ public:
     
     void goal(rcsc::PlayerAgent* agent );
 
+    int load_unum(std::string path);
     
     
 };

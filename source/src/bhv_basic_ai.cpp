@@ -16,8 +16,6 @@
 
 #include "bhv_basic_ai.h"
 
-#include <rcsc/action/basic_actions.h>
-
 #include "classes/ai_agent.h"
 #include "classes/state.h"
 #include "classes/action.h"
@@ -34,20 +32,37 @@
 
 bool bhv_basic_ai::execute(rcsc::PlayerAgent* agent )
 {
+    
+    if(Bhv_BasicTackle(80,0.80).execute(agent))
+    {
+        return true;
+    }
+    
     const WorldModel & wm = agent->world();
 
+    if(wm.self().unum() != 5)
+    {
+        const AbstractPlayerObject * opp_player = wm.theirPlayer(5);
+
+        Vector2D d = opp_player->pos();
+        std::cout<<"\n"<<d.x<<"\n";
+        //return false;
+    }
     state state;
     state.get_state(agent);
     
-    //if(wm.self().angleFromBall().abs() > 20)
-    //{
-    //    return Body_TurnToBall().execute( agent );
-    //}
+    if(wm.self().angleFromBall().abs() > 20)
+    {
+        
+    }
     
     
     bool done = wm.gameMode().type() == rcsc::GameMode::PlayOn ? false : true ;
     
-    agents[wm.self().unum()].save_next_state(agent,state,done);
+    if( agents[wm.self().unum()].get_mem_counter() != 0)
+    {
+        agents[wm.self().unum()].save_next_state(agent,state,done);
+    }
     
     if(done) {return true;}
     
@@ -75,6 +90,11 @@ void bhv_basic_ai::load_agent(rcsc::PlayerAgent* agent , bool Learn_mode , bool 
     
     std::string Name = name[wm.self().unum() - 1] , path = "team_data/";
 
+    if(wm.self().unum() ==5)
+    {
+        SamplePlayer().s.assign(agents[wm.self().unum()].get_random_num(-50,-10,false),agents[wm.self().unum()].get_random_num(-30,30,false));
+    }
+
     if(Learn_mode)
     {
         if(wm.ourSide() == rcsc::SideID::LEFT)
@@ -83,7 +103,9 @@ void bhv_basic_ai::load_agent(rcsc::PlayerAgent* agent , bool Learn_mode , bool 
         }
         else { path = path_r; }
     }
-    if(Read_from_file && false)
+    unum = load_unum(path);
+
+    if(Read_from_file)
     {
         if(agents[wm.self().unum()].load_agent(agent , path , Name , Learn_mode) == false)
         {
@@ -92,7 +114,7 @@ void bhv_basic_ai::load_agent(rcsc::PlayerAgent* agent , bool Learn_mode , bool 
     }
     else
     {
-        agents[wm.self().unum()] = agent_data(agent,path ,Learn_mode, false);
+        agents[wm.self().unum()] = agent_data(agent,path ,Learn_mode, Read_from_file);
     }
     
     agents[wm.self().unum()].learn_mode = Learn_mode;
@@ -177,4 +199,20 @@ ai_agent bhv_basic_ai::agent_data(rcsc::PlayerAgent* agent , std::string Path ,b
     
 }
 
+int bhv_basic_ai::load_unum(std::string path)
+{
+    std::ifstream file;
+    file.open(path + "random_num.csv"); // open our file
+
+    if(file.fail())
+    { return false;}
+
+    std::string dummy; // dummy string to hold our data for exchanging data
+    std::getline(file , dummy); // this line is just the header line
+
+    std::getline(file , dummy );
+    int n = std::stoi(dummy);
+    file.close();
+    return n;
+}
 

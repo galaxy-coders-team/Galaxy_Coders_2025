@@ -40,8 +40,13 @@ public:
     bool execute( rcsc::PlayerAgent * agent );
     rcsc::Vector2D getPosition(const rcsc::WorldModel & wm, int unum);
     double get_normal_dash_power( const rcsc::WorldModel & wm );
-
-
+    int areanumber_def(const rcsc::WorldModel & wm);
+    rcsc::Vector2D areapos_def(const rcsc::WorldModel & wm);
+    int areanumber_att(const rcsc::WorldModel & wm);
+    rcsc::Vector2D areapos_att(const rcsc::WorldModel & wm);
+    rcsc::Vector2D def_position(rcsc::PlayerAgent * agent,int u);
+    rcsc::Vector2D at_position(rcsc::PlayerAgent * agent,int u);
+    bool mark(rcsc::PlayerAgent *agent);
 private:
     double getDashPower( const rcsc::PlayerAgent * agent );
 };

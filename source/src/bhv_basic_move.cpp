@@ -255,7 +255,7 @@ Vector2D Bhv_BasicMove::def_position(rcsc::PlayerAgent* agent,int u)
 {
     const WorldModel &wm=agent->world();
     int point=areanumber_def(wm);
-    Vector2D ball_area=areapos_def(wm);
+    Vector2D ball_area= areapos_def(wm);
     Vector2D ball_pos=wm.ball().pos();
     
     Vector2D pos[12];
@@ -278,7 +278,7 @@ Vector2D Bhv_BasicMove::def_position(rcsc::PlayerAgent* agent,int u)
         ball_pos1=wm.ball().inertiaPoint(opp_min);
     }
     pos2[0]=ball_pos1;
-    Vector2D e=ball_pos1-ball_area;
+    Vector2D e = ball_pos1-ball_area;
     Vector2D team[12];
     std::vector <const AbstractPlayerObject *> teammate1;
     std::vector <Vector2D> team1;

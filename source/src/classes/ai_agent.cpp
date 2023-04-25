@@ -78,13 +78,12 @@ void ai_agent::get_params(std::string Name, rcsc::PlayerAgent* agent, std::strin
     // analysis params
     rewards_mean = 0;
     
-    // build agent replay bufer to save the game experience
-    agent_move_memory.get_params(max_mem);
-    agent_kick_memory.get_params(max_mem);
+    agent_memory.get_params(max_mem); // build agent replay bufer to save the game experience
     
     const rcsc::WorldModel & wm = agent->world(); // build world mode
     
     bool isGoaler = wm.self().unum() == wm.ourGoalieUnum() ? true : false ; // get our agent type to set the reward method
+    reward.get_params(isGoaler); // set the reward params
     
     use_model = Use_model;
     
@@ -102,48 +101,21 @@ void ai_agent::get_params(std::string Name, rcsc::PlayerAgent* agent, std::strin
 void ai_agent::save_experience(state State, action Action)
 {
     if(learn_mode == false) { return; }
-    if(State.is_kickable)
-    {
-        agent_kick_memory.add_experience(State,Action);
-        last_state_is_move = false;
-    }
-    else
-    {
-        agent_move_memory.add_experience(State,Action);
-        last_state_is_move = true;
-    }
+    agent_memory.add_experience(State,Action);
 }
 
 void ai_agent::save_next_state(rcsc::PlayerAgent * agent , state Next_state, bool Done)
 {
     if(learn_mode == false) { return; }
     
-    state State;
-    action Action;
-    
-    if(last_state_is_move)
-    {
-        State = agent_move_memory.get_last_state();
-        Action = agent_move_memory.get_last_action();
-    }
-    else
-    {
-        State = agent_kick_memory.get_last_state();
-        Action = agent_kick_memory.get_last_action();
-    }
+    state State = agent_memory.get_last_state();
+    action Action = agent_memory.get_last_action();
     
     double Reward = reward.reward(agent,State,Action,Next_state);
     
-    rewards_mean = new_rewards_mean(Reward , (agent_kick_memory.get_counter() + agent_move_memory.get_counter()) );
+    rewards_mean = new_rewards_mean(Reward , agent_memory.get_counter());
     
-    if(last_state_is_move)
-    {
-        agent_move_memory.add_next_state(Reward,Next_state,Done);
-    }
-    else
-    {
-        agent_kick_memory.add_next_state(Reward,Next_state,Done);
-    }
+    agent_memory.add_next_state(Reward,Next_state,Done);
 }
 
 action ai_agent::take_action(state State)
@@ -157,38 +129,31 @@ action ai_agent::take_action(state State)
         random_num = get_random_num(0,1,false); // generate random number between 0 and 1
     }
     
-     int action_type = State.is_kickable ? 0 : 1 ;
+     int action_type = 0;
      double direction = 0;
      double power = 0;
      
     if(random_num < epsilon) // creat random action
     {
 
+        action_type = (int)get_random_num(0,4,true);
+
        direction = get_random_num(-1 , 1 , false);
        power = get_random_num( 0 , 1 , false);
        
+       action.get_action(direction,power,action_type);
     }
     else //take action using ann
     {
        std::vector<double> model_input = State.to_array();
     
-        std::vector<double> output;
-        
-        if(State.is_kickable)
-        {
-            output = kick_model.predict(model_input);
-        }
-        else
-        {
-            output = move_model.predict(model_input);
-        }
+        std::vector<double> output = model.predict(model_input);
     
-        direction = output[1] ;
-        power = output[2] ;
+        action.action_type = output[0];
+        action.direction = output[1] ;
+        action.power = output[2] ;
     }
     
-
-    action.get_action(direction,power,action_type);
     
     if(learn_mode == true)
     {
@@ -209,21 +174,37 @@ action ai_agent::take_action(state State)
     return action;
 }
 
-void ai_agent::save_memory_file(std::string part ,std::vector<memory> data)
+void ai_agent::save_memory_file()
 {
      if(learn_mode == false)
     { return; }
     
-    //creat files
-    std::ofstream state_file(  path + part +"memory/" + "states/" + name + "_states.csv" , std::ios_base::app);
-    std::ofstream action_file( path + part +"memory/"+ "actions/" + name + "_actions.csv", std::ios_base::app);
-    std::ofstream reward_file( path + part +"memory/" + "rewards/" + name + "_rewards.csv", std::ios_base::app);
-    std::ofstream next_state_file( path + part + "memory/" + "next_states/" + name + "_next_states.csv", std::ios_base::app);
-    std::ofstream done_file( path + part +"memory/" + "done/" + name + "_done_memory.csv", std::ios_base::app);
+    std::vector<memory> data = agent_memory.memory_batch(batch_size);
+    
+    if(data.size() != batch_size)
+    { return; }
+    
+    std::ofstream state_file( path + "memory/" + "states/" + name + "_states.csv"); //creat file
+    std::ofstream action_file( path + "memory/"+ "actions/" + name + "_actions.csv"); //creat file
+    std::ofstream reward_file( path + "memory/" + "rewards/" + name + "_rewards.csv"); //creat file
+    std::ofstream next_state_file( path + "memory/" + "next_states/" + name + "_next_states.csv"); //creat file
+    std::ofstream done_file( path + "memory/" + "done/" + name + "_done_memory.csv"); //creat file
+    
+    state_file.clear();
+    action_file.clear();
+    reward_file.clear();
+    next_state_file.clear();
+    done_file.clear();
     
     if(state_file.is_open() && action_file.is_open() 
           && reward_file.is_open() && next_state_file.is_open() && done_file.is_open())
     {
+        state_file <<" 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57,58\n" ;
+        reward_file << "Rewards \n";
+        action_file << "action_type,direction,power \n";
+        next_state_file <<" 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57,58\n" ;
+        done_file<<"done \n";
+
         for(int i = 0 ; i < data.size() ; i++)
         {
             
@@ -296,12 +277,6 @@ void ai_agent::save_agent()
        
        is_saved  =  true;
     }
-    
-    std::vector<memory> move_data = agent_move_memory.get_memory(),
-                        kick_data = agent_kick_memory.get_memory();
-                        
-    save_memory_file("move_",move_data);
-    save_memory_file("kick_",kick_data);
 }
 
 bool ai_agent::load_agent(rcsc::PlayerAgent * agent , std::string Path, std::string Name , bool Learn_mode)
@@ -354,14 +329,13 @@ bool ai_agent::load_agent(rcsc::PlayerAgent * agent , std::string Path, std::str
     learn_mode = Learn_mode;
     
     file.close();
-
-    // build agent replay bufer to save the game experience
-    agent_move_memory.get_params(max_mem);
-    agent_kick_memory.get_params(max_mem);
+    
+    agent_memory.get_params(max_mem); // build agent replay bufer to save the game experience
     
     const rcsc::WorldModel & wm = agent->world(); // build world mode
     
     bool isGoaler = wm.self().unum() == wm.ourGoalieUnum() ? true : false ; // get our agent type to set the reward method
+    reward.get_params(isGoaler); // set the reward params
     
     load_model();
     
@@ -378,24 +352,21 @@ void ai_agent::load_model()
 {
     state s;
     uint32_t input_dims = s.state_dims;
+    std::vector<uint32_t> model_shape = { input_dims ,300,400,300,200};
     
-    std::vector<uint32_t> move_model_shape = { input_dims ,300,400,300,200};
-    std::vector<uint32_t> kick_model_shape = { input_dims ,300,400,300,200};
-    
-    move_model.get_param(move_model_shape , path + "models_weights/move_model" + name + "_");
-    kick_model.get_param(kick_model_shape , path + "models_weights/kick_model" + name + "_");
+    model.get_param(model_shape , path + "models_weights/" + name + "_");
 }
 
 
 int ai_agent::get_mem_counter()
 {
-    return agent_kick_memory.get_counter();
+    return agent_memory.get_counter();
 }
 
 void ai_agent::add_goal_reward(int time)
 {
     if(learn_mode == false) { return; }
-    agent_kick_memory.add_reward(time , reward.player_goal);
+    agent_memory.add_reward(time , reward.goal_score);
 }
 
 
@@ -416,7 +387,7 @@ void ai_agent::save_rewards_mean()
 {
     if(learn_mode == false) {return;}
     
-    std::ofstream file(path + "agents_reward_avg/" + name + "_rewards_mean.csv" , std::ios_base::app); //creat file
+    std::ofstream file(path + "agents_reward_avg/" + name + "_rewards_mean.csv"); //creat file
     
     if(file.is_open())
     {

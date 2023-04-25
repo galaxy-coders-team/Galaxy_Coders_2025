@@ -77,6 +77,8 @@ public:
     ai_agent agent_data(rcsc::PlayerAgent * agent, std::string Path ,bool Learn_mode, bool Read_from_file);
     
     void goal(rcsc::PlayerAgent* agent );
+
+    int load_unum(std::string path);
     
     
 };

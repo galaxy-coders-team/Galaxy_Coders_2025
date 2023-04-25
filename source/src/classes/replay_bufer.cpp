@@ -62,19 +62,29 @@ void replay_bufer::add_reward(int Mem_counter, double Reward)
 }
 
 
-std::vector<memory> replay_bufer::get_memory()
+std::vector<memory> replay_bufer::memory_batch(int batch_size)
 {
-    std::vector<memory> output;
+    std::vector<memory> batch;
     
     int mem_fill = std::min(mem_counter,mem_size); // number of filled memory
     
-    
-    for(int i = 0 ; i < mem_fill ; i++)
+    if(batch_size > mem_fill)
     {
-        output.push_back(exp_memory[i]); // add memory to list
+        return batch;
     }
     
-    return output;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0,mem_fill); // just for creat random number between 0 to mem_fill
+    
+    while(batch.size() < batch_size)
+    {
+        int index = (int)dis(gen); // get random number
+        batch.push_back(exp_memory[ index ]); // add memory to batch list
+    }
+    
+    
+    return batch;
 }
 
 state replay_bufer::get_last_state()

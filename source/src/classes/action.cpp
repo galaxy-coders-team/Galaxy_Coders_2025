@@ -42,6 +42,7 @@ std::string action::to_string()
 {
     std::string output = "";
     
+    output += std::to_string(action_type * 100); output += ",";
     output += std::to_string(direction   * 100); output += ",";
     output += std::to_string(power       * 100);
     

@@ -32,33 +32,30 @@
 
 bool bhv_basic_ai::execute(rcsc::PlayerAgent* agent )
 {
-    
-    if(Bhv_BasicTackle(80,0.80).execute(agent))
-    {
-        return true;
-    }
-    
     const WorldModel & wm = agent->world();
 
+    if(wm.self().unum() != 5)
+    {
+        const AbstractPlayerObject * opp_player = wm.theirPlayer(5);
+
+        Vector2D d = opp_player->pos();
+        std::cout<<"\n"<<d.x<<"\n";
+        //return false;
+    }
     state state;
     state.get_state(agent);
     
-    if(wm.self().angleFromBall().abs() > 20)
-    {
-        
-    }
-    
-    
     bool done = wm.gameMode().type() == rcsc::GameMode::PlayOn ? false : true ;
     
-    agents[wm.self().unum()].save_next_state(agent,state,done);
-    
-    if(done) {return true;}
+    if( agents[wm.self().unum()].get_mem_counter() != 0)
+    {
+        agents[wm.self().unum()].save_next_state(agent,state,done);
+    }
     
     action action;
     action = agents[wm.self().unum()].take_action(state);
     
-    do_action(agent , action ,agents[wm.self().unum()].get_mem_counter());
+    do_action(agent,action ,agents[wm.self().unum()].get_mem_counter());
     
     agents[wm.self().unum()].save_experience(state,action);
     
@@ -92,6 +89,7 @@ void bhv_basic_ai::load_agent(rcsc::PlayerAgent* agent , bool Learn_mode , bool 
         }
         else { path = path_r; }
     }
+    unum = load_unum(path);
 
     if(Read_from_file)
     {
@@ -125,6 +123,7 @@ void bhv_basic_ai::save_agent(rcsc::PlayerAgent* agent)
     std::cout<<"***** rewards mean : "<<agents[wm.self().unum()].rewards_mean<<"\n";
 
     agents[wm.self().unum()].save_agent();
+    agents[wm.self().unum()].save_memory_file();
     agents[wm.self().unum()].save_rewards_mean();
     
 
@@ -137,10 +136,21 @@ bool bhv_basic_ai::do_action(rcsc::PlayerAgent* agent , action action , int Last
     
     const WorldModel & wm = agent->world();
     
+    int action_type = action.action_type;
     double direction = action.direction * 180;
     double power = action.power * 100;
     
-    if(action.action_type == 0) // kick
+    bool kickable =wm.self().isKickable();
+
+    if ( wm.existKickableTeammate()
+            && wm.teammatesFromBall().front()->distFromBall() < wm.ball().distFromSelf() )
+    {
+        kickable = false;
+    }
+
+    double dist = wm.getOpponentNearestToSelf(5) != NULL ?wm.getDistOpponentNearestToSelf(5) :5;
+
+    if(action_type == 0 && wm.self().isKickable() && kickable) // kick
     {
         if(agent->doKick(power,direction))
         {
@@ -148,9 +158,19 @@ bool bhv_basic_ai::do_action(rcsc::PlayerAgent* agent , action action , int Last
             last_kick_time = Last_kick_time;
             return true;
         }
+        
     }
-    else //Move
+    else if(action_type == 1 && Bhv_BasicTackle(0.8,80.0).execute(agent)) // tackle
     {
+        return agent->doTackle(power);
+    }
+    else if(action_type == 2)  // turn
+    {
+        return agent->doTurn(direction);
+    }
+    else // 3 => dash
+    {
+        
         return agent->doDash(power,direction);
     }
     
@@ -187,4 +207,20 @@ ai_agent bhv_basic_ai::agent_data(rcsc::PlayerAgent* agent , std::string Path ,b
     
 }
 
+int bhv_basic_ai::load_unum(std::string path)
+{
+    std::ifstream file;
+    file.open(path + "random_num.csv"); // open our file
+
+    if(file.fail())
+    { return false;}
+
+    std::string dummy; // dummy string to hold our data for exchanging data
+    std::getline(file , dummy); // this line is just the header line
+
+    std::getline(file , dummy );
+    int n = std::stoi(dummy);
+    file.close();
+    return n;
+}
 

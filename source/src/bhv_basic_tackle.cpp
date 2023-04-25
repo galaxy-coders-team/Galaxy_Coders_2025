@@ -120,7 +120,7 @@ Bhv_BasicTackle::execute( PlayerAgent * agent )
 
         double tackle_dir = 0.0;
 
-        agent->doTackle( tackle_dir, use_foul );
+        //agent->doTackle( tackle_dir, use_foul );
 
         return true;
     }

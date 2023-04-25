@@ -46,7 +46,7 @@ public:
     state get_last_state();
     action get_last_action();
     
-    std::vector<memory> get_memory(); // return batch  of random memory from exp_memory list
+    std::vector<memory> memory_batch(int); // return batch  of random memory from exp_memory list
     int get_counter();
     void add_reward(int Mem_counter ,double Reward);
     

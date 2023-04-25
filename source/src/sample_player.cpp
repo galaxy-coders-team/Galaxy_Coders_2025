@@ -231,9 +231,6 @@ SamplePlayer::actionImpl()
             // catchable
             const AbstractPlayerObject * opp_player = this->world().theirPlayer(5);
 
-            Vector2D d = opp_player->pos();
-            std::cout<<"\n ccc"<<d.x<<"\n";
-
             if ( this->world().time().cycle()
                  > this->world().self().catchTime().cycle() + ServerParam::i().catchBanCycle()
                  && this->world().ball().distFromSelf() < ServerParam::i().catchableArea() - 0.05
@@ -262,16 +259,19 @@ SamplePlayer::actionImpl()
                 kickable = false;
             }
             
-            bhv_basic_ai().execute(this);
+            if(use_ai)
+            {
+                bhv_basic_ai().execute(this);
+            }
             
-            /*if ( kickable )
+            else if ( kickable )
             {
                 Bhv_BasicOffensiveKick().execute( this );
             }
             else
             {
                 Bhv_BasicMove().execute( this );
-            }*/
+            }
         }
         return;
     }
@@ -469,31 +469,30 @@ SamplePlayer::doPreprocess()
     if ( wm.gameMode().type() == GameMode::BeforeKickOff
     || wm.gameMode().type() == GameMode::AfterGoal_ )
     {
-        if(wm.gameMode().type() == GameMode::BeforeKickOff && wm.self().unum() != 1 && wm.time().cycle() < 1)
+        if(use_ai)
         {
-            bhv_basic_ai().load_agent(this ,learn_mode ,read_from_file);
-        }
-        
-        if(wm.gameMode().type() == GameMode::AfterGoal_ && wm.self().unum() != 1)
-        {
-            if(wm.gameMode().side() == wm.ourSide())
+            if(wm.gameMode().type() == GameMode::BeforeKickOff && wm.self().unum() != 1 && wm.time().cycle() < 1)
             {
-                bhv_basic_ai().goal(this);
+                bhv_basic_ai().load_agent(this ,learn_mode ,read_from_file);
             }
+        
+            if(wm.gameMode().type() == GameMode::AfterGoal_ && wm.self().unum() != 1)
+            {
+                if(wm.gameMode().side() == wm.ourSide())
+                {
+                    bhv_basic_ai().goal(this);
+                }
             
-            bhv_basic_ai().execute(this);
+                bhv_basic_ai().execute(this);
             
+            }
+        
+            if(wm.self().unum() != 1 && wm.time().cycle() > 4000)
+            {
+                bhv_basic_ai().save_agent(this);
+            }
         }
         
-        if(wm.self().unum() != 1 && wm.time().cycle() > 4000)
-        {
-            bhv_basic_ai().save_agent(this);
-        }
-        
-
-
-
-
         dlog.addText( Logger::TEAM,
         __FILE__": before_kick_off" );
 
@@ -514,12 +513,12 @@ SamplePlayer::doPreprocess()
         return true;
     }
     
-    if(wm.self().unum() != 1 && wm.time().cycle() > 5000)
+    if(use_ai && wm.self().unum() != 1 && wm.time().cycle() > 5000)
         {
             bhv_basic_ai().save_agent(this);
         }
     
-    if(wm.gameMode().type() == GameMode::FreeKick_ && wm.self().unum() != 1 && wm.time().cycle() > 1)
+    if(use_ai && wm.gameMode().type() == GameMode::FreeKick_ && wm.self().unum() != 1 && wm.time().cycle() > 1)
     {
         bhv_basic_ai().save_agent(this);
     }

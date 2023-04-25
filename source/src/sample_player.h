@@ -43,7 +43,8 @@ private:
     
 public:
 
-    bool learn_mode = true;
+    bool use_ai = false;
+    bool learn_mode = false;
     bool read_from_file = true;
     inline static Vector2D s;
     

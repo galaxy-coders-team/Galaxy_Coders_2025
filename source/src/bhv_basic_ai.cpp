@@ -89,7 +89,6 @@ void bhv_basic_ai::load_agent(rcsc::PlayerAgent* agent , bool Learn_mode , bool 
         }
         else { path = path_r; }
     }
-    unum = load_unum(path);
 
     if(Read_from_file)
     {
@@ -100,7 +99,7 @@ void bhv_basic_ai::load_agent(rcsc::PlayerAgent* agent , bool Learn_mode , bool 
     }
     else
     {
-        agents[wm.self().unum()] = agent_data(agent,path ,Learn_mode, Read_from_file);
+        agents[wm.self().unum()] = agent_data(agent,path ,Learn_mode, false);
     }
     
     agents[wm.self().unum()].learn_mode = Learn_mode;
@@ -205,22 +204,5 @@ ai_agent bhv_basic_ai::agent_data(rcsc::PlayerAgent* agent , std::string Path ,b
     
     return ai_agent;
     
-}
-
-int bhv_basic_ai::load_unum(std::string path)
-{
-    std::ifstream file;
-    file.open(path + "random_num.csv"); // open our file
-
-    if(file.fail())
-    { return false;}
-
-    std::string dummy; // dummy string to hold our data for exchanging data
-    std::getline(file , dummy); // this line is just the header line
-
-    std::getline(file , dummy );
-    int n = std::stoi(dummy);
-    file.close();
-    return n;
 }
 

@@ -42,7 +42,7 @@ class reward_calculator
     double distanc_from_playgrand_edge(state New_state);
   
 public:
-    double goal_score = 100;
+    double goal_score = 400;
      
     void get_params(bool IsGoaler);  // set the reward_calculator prams
     double reward(rcsc::PlayerAgent * agent , state State,action Actio,state New_state); // calculat reward white agent_state and new_state

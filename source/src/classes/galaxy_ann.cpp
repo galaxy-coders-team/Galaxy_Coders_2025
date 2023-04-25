@@ -43,19 +43,7 @@ void galaxy_ann::get_param(std::vector<uint32_t> topology, std::string main_path
     }
     
     i = topology.size() - 1;
-    //action type
-    matrix action_type_weigh(4 , topology[topology.size() - 1]);
-    matrix action_type_bias(1 ,4);
-    
-    action_type_bias = action_type_bias.fill(5);
-    
-    action_type_weigh = action_type_weigh.read_from_file(main_path +  std::to_string(i) + "_weights.csv");
-    action_type_bias = action_type_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
-    
-    _weightMatrices.push_back(action_type_weigh);
-    _biasMatrices.push_back(action_type_bias);
-    
-    i += 1;
+
     //direction
     matrix direction_weigh(1,topology[topology.size() - 1]);
     matrix direction_bias(1 ,1);
@@ -102,21 +90,16 @@ std::vector<double> galaxy_ann::action_output(matrix& base)
 {
     std::vector<double> values;
     
-    int index = _weightMatrices.size() - 3;
+    int index = _weightMatrices.size() - 2;
     matrix x;
     
     x = base.multiply( _weightMatrices[index] );
     x = x.add(_biasMatrices[index]);
     
-    values.push_back( argmax_softmax(x) );
+    values.push_back( tanh(x.at(0,0)) ) ;
     
     x = base.multiply( _weightMatrices[index + 1] );
     x = x.add(_biasMatrices[index + 1]);
-    
-    values.push_back( tanh(x.at(0,0)) ) ;
-    
-    x = base.multiply( _weightMatrices[index + 2] );
-    x = x.add(_biasMatrices[index + 2]);
     
     values.push_back( sigmoid(x.at(0,0)));
     

@@ -129,15 +129,12 @@ action ai_agent::take_action(state State)
         random_num = get_random_num(0,1,false); // generate random number between 0 and 1
     }
     
-     int action_type = 0;
+     int action_type = State.is_kickable ? 0 : 1;
      double direction = 0;
      double power = 0;
      
     if(random_num < epsilon) // creat random action
     {
-
-        action_type = (int)get_random_num(0,4,true);
-
        direction = get_random_num(-1 , 1 , false);
        power = get_random_num( 0 , 1 , false);
        
@@ -149,11 +146,11 @@ action ai_agent::take_action(state State)
     
         std::vector<double> output = model.predict(model_input);
     
-        action.action_type = output[0];
-        action.direction = output[1] ;
-        action.power = output[2] ;
+        direction = output[0] ;
+        power = output[1] ;
     }
-    
+
+    action.get_action(direction,power,action_type);
     
     if(learn_mode == true)
     {
@@ -387,11 +384,11 @@ void ai_agent::save_rewards_mean()
 {
     if(learn_mode == false) {return;}
     
-    std::ofstream file(path + "agents_reward_avg/" + name + "_rewards_mean.csv"); //creat file
+    std::ofstream file(path + "agents_reward_avg/" + name + "_rewards_mean.csv", std::ios_base::app); //creat file
     
     if(file.is_open())
     {
-        file<< "reward \n"<< rewards_mean;
+        file<< rewards_mean<< "\n";
         
         if(!file.fail())
         {

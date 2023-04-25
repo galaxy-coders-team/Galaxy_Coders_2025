@@ -28,9 +28,6 @@ double reward_calculator::reward(rcsc::PlayerAgent * agent , state State , actio
     double Reward = 0;
     
     // reward main method
-    Reward += Action.action_type == 0 && State.is_kickable == false ? -200 : 0;
-    Reward += Action.action_type == 1 && State.is_tacklable == false ? -200 : 0;
-
     Reward += ball_distance_change(State,New_state);
     Reward += goal_distance_change(State,New_state);
     Reward += is_kick(agent,Action);

@@ -235,7 +235,7 @@ std::vector<double> state::to_array()
         (double)speed,
         (double)stamina ,(double)stamina_capacity ,
         (double)dist_from_ball ,(double)dist_from_goal ,
-        (double)is_tacklable ,(double)is_kickable , (double)exist_kickable_teammate,
+        (double)is_kickable , (double)exist_kickable_teammate,
 
         (double)tm_pos[0].x  ,(double)tm_pos[0].y ,
         (double)tm_pos[1].x  ,(double)tm_pos[1].y ,

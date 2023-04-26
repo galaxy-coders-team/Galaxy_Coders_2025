@@ -104,7 +104,7 @@ Bhv_GoalieBasicMove::execute( PlayerAgent * agent )
 
 Vector2D Bhv_GoalieBasicMove::getTargetPoint( PlayerAgent * agent )
 {
-
+    return bhv_basic_ai().goalie_execute(agent);
 }
 
 // Vector2D

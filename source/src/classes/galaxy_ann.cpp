@@ -157,7 +157,6 @@ matrix galaxy_ann::relu(matrix& input)
 }
 
 
-
 int galaxy_ann::argmax_softmax(matrix& input)
 {
     int output = 0;
@@ -176,6 +175,11 @@ int galaxy_ann::argmax_softmax(matrix& input)
     }
     
     return output;
+}
+
+double galaxy_ann::liner(double input, double min, double max)
+{
+    
 }
 
 

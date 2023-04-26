@@ -206,7 +206,6 @@ std::string state::to_string()
     data += std::to_string(stamina_capacity * 100) ; data += "," ;
     data += std::to_string(dist_from_ball   * 100) ; data += "," ;
     data += std::to_string(dist_from_goal   * 100) ; data += "," ;
-    data += std::to_string(is_tacklable     * 100) ; data += "," ;
     data += std::to_string(is_kickable      * 100) ; data += "," ;
     data += std::to_string(exist_kickable_teammate * 100) ; data += ",";
 
@@ -235,7 +234,7 @@ std::vector<double> state::to_array()
         (double)speed,
         (double)stamina ,(double)stamina_capacity ,
         (double)dist_from_ball ,(double)dist_from_goal ,
-        (double)is_kickable , (double)exist_kickable_teammate,
+        (double)is_kickable , (double)exist_kickable_teammate,//15
 
         (double)tm_pos[0].x  ,(double)tm_pos[0].y ,
         (double)tm_pos[1].x  ,(double)tm_pos[1].y ,
@@ -246,7 +245,7 @@ std::vector<double> state::to_array()
         (double)tm_pos[6].x  ,(double)tm_pos[6].y ,
         (double)tm_pos[7].x  ,(double)tm_pos[7].y ,
         (double)tm_pos[8].x  ,(double)tm_pos[8].y ,
-        (double)tm_pos[9].x  ,(double)tm_pos[9].y ,
+        (double)tm_pos[9].x  ,(double)tm_pos[9].y ,//20
 
         (double)opp_pos[0].x  ,(double)opp_pos[0].y ,
         (double)opp_pos[1].x  ,(double)opp_pos[1].y ,
@@ -258,11 +257,11 @@ std::vector<double> state::to_array()
         (double)opp_pos[7].x  ,(double)opp_pos[7].y ,
         (double)opp_pos[8].x  ,(double)opp_pos[8].y ,
         (double)opp_pos[9].x  ,(double)opp_pos[9].y ,
-        (double)opp_pos[10].x ,(double)opp_pos[10].y ,
+        (double)opp_pos[10].x ,(double)opp_pos[10].y ,//22
 
     };
 
-    state_dims = 58;
+    state_dims = 57;
 
     return array;
 }

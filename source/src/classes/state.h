@@ -31,7 +31,7 @@ class state
 {
 public:
     
-    uint32_t state_dims = 58;
+    uint32_t state_dims = 57;
 
     Vector2D self_pos;
     Vector2D ball_pos;

@@ -196,10 +196,10 @@ void ai_agent::save_memory_file()
     if(state_file.is_open() && action_file.is_open() 
           && reward_file.is_open() && next_state_file.is_open() && done_file.is_open())
     {
-        state_file <<" 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57,58\n" ;
+        state_file <<" 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57\n" ;
         reward_file << "Rewards \n";
-        action_file << "action_type,direction,power \n";
-        next_state_file <<" 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57,58\n" ;
+        action_file << "direction,power \n";
+        next_state_file <<" 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57\n" ;
         done_file<<"done \n";
 
         for(int i = 0 ; i < data.size() ; i++)
@@ -349,7 +349,7 @@ void ai_agent::load_model()
 {
     state s;
     uint32_t input_dims = s.state_dims;
-    std::vector<uint32_t> model_shape = { input_dims ,300,400,300,200};
+    std::vector<uint32_t> model_shape = { input_dims ,400,300,200};
     
     model.get_param(model_shape , path + "models_weights/" + name + "_");
 }

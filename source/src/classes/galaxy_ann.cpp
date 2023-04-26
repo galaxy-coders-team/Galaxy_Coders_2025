@@ -37,19 +37,18 @@ void galaxy_ann::get_param(std::vector<uint32_t> topology, std::string main_path
                     
         matrix biasMatrix(1 ,topology[i + 1]  );
         
-        biasMatrix = biasMatrix.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
+         biasMatrix = biasMatrix.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
         _biasMatrices.push_back(biasMatrix);
    
     }
     
     i = topology.size() - 1;
-
     //direction
     matrix direction_weigh(1,topology[topology.size() - 1]);
     matrix direction_bias(1 ,1);
     
     direction_weigh = direction_weigh.read_from_file(main_path +  std::to_string(i) + "_weights.csv");
-    direction_bias = direction_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv");
+    direction_bias = direction_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
     
     _weightMatrices.push_back(direction_weigh);
     _biasMatrices.push_back(direction_bias);
@@ -60,7 +59,7 @@ void galaxy_ann::get_param(std::vector<uint32_t> topology, std::string main_path
     matrix power_bias(1 ,1);
     
     power_weigh = power_weigh.read_from_file(main_path +  std::to_string(i) + "_weights.csv");
-    power_bias = power_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv");
+    power_bias = power_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
     
     _weightMatrices.push_back(power_weigh);
     _biasMatrices.push_back(power_bias);
@@ -76,7 +75,7 @@ matrix galaxy_ann::base(matrix& input)
     matrix values = input;
     
     //forwording inputs to next layers
-    for(uint32_t i = 0; i < _weightMatrices.size() - 3; i++)
+    for(uint32_t i = 0; i < _weightMatrices.size() - 2; i++)
     {
         values = values.multiply(_weightMatrices[i]);
         values = values.add(_biasMatrices[i]);

@@ -17,10 +17,9 @@ class ActorNetwork(keras.Model):
         super(ActorNetwork,self).__init__()
         
         #base model 
-        self.base_1 = Dense(300, activation="relu")
-        self.base_2 = Dense(400, activation="relu")
-        self.base_3 = Dense(300, activation="relu")
-        self.base_4 = Dense(200, activation="relu")
+        self.base_1 = Dense(400, activation="relu")
+        self.base_2 = Dense(300, activation="relu")
+        self.base_3 = Dense(200, activation="relu")
 
         # output
         self.direction   = Dense(1, activation="tanh")     # otp=[-1,1]
@@ -32,7 +31,6 @@ class ActorNetwork(keras.Model):
         x = self.base_1(inputs)
         x = self.base_2(x)
         x = self.base_3(x)
-        x = self.base_4(x)
 
         # get outputs white base value
         direction = self.direction(x)
@@ -40,4 +38,4 @@ class ActorNetwork(keras.Model):
 
         output = tf.concat([direction,power], axis=1)
 
-        return output # action_type , direction , power
+        return output #  direction , power

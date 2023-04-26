@@ -38,6 +38,7 @@
 #include "bhv_goalie_basic_move.h"
 
 #include "bhv_basic_tackle.h"
+#include "bhv_basic_ai.h"
 
 #include <rcsc/action/basic_actions.h>
 #include <rcsc/action/body_go_to_point.h>
@@ -88,10 +89,10 @@ Bhv_GoalieBasicMove::execute( PlayerAgent * agent )
         return true;
     }
     
-    //if(wm.self().pos().dist(move_point) > 1){
-    if (!Body_GoToPoint2010(move_point,1.0,100).execute(agent))
+    if(wm.self().pos().dist(move_point) > 1){
+     if (!Body_GoToPoint2010(move_point,1.0,100).execute(agent))
         Body_TurnToPoint(move_point).execute(agent);
-    //}
+    }
 
     return true;
 }
@@ -100,121 +101,127 @@ Bhv_GoalieBasicMove::execute( PlayerAgent * agent )
 /*!
 
  */
-Vector2D
-Bhv_GoalieBasicMove::getTargetPoint( PlayerAgent * agent )
+
+Vector2D Bhv_GoalieBasicMove::getTargetPoint( PlayerAgent * agent )
 {
-    const double base_move_x = -49.8;
-    const double danger_move_x = -51.5;
-    const WorldModel & wm = agent->world();
 
-    int ball_reach_step = 0;
-    if ( ! wm.existKickableTeammate()
-         && ! wm.existKickableOpponent() )
-    {
-        ball_reach_step
-            = std::min( wm.interceptTable()->teammateReachCycle(),
-                        wm.interceptTable()->opponentReachCycle() );
-    }
-    const Vector2D base_pos = wm.ball().inertiaPoint( ball_reach_step );
-
-
-    //---------------------------------------------------------//
-    // angle is very dangerous
-    if ( base_pos.y > ServerParam::i().goalHalfWidth() + 3.0 )
-    {
-        Vector2D right_pole( - ServerParam::i().pitchHalfLength(),
-                             ServerParam::i().goalHalfWidth() );
-        AngleDeg angle_to_pole = ( right_pole - base_pos ).th();
-
-        if ( -140.0 < angle_to_pole.degree()
-             && angle_to_pole.degree() < -90.0 )
-        {
-            agent->debugClient().addMessage( "RPole" );
-            return Vector2D( danger_move_x, ServerParam::i().goalHalfWidth() + 0.001 );
-        }
-    }
-    else if ( base_pos.y < -ServerParam::i().goalHalfWidth() - 3.0 )
-    {
-        Vector2D left_pole( - ServerParam::i().pitchHalfLength(),
-                            - ServerParam::i().goalHalfWidth() );
-        AngleDeg angle_to_pole = ( left_pole - base_pos ).th();
-
-        if ( 90.0 < angle_to_pole.degree()
-             && angle_to_pole.degree() < 140.0 )
-        {
-            agent->debugClient().addMessage( "LPole" );
-            return Vector2D( danger_move_x, - ServerParam::i().goalHalfWidth() - 0.001 );
-        }
-    }
-
-    //---------------------------------------------------------//
-    // ball is close to goal line
-    if ( base_pos.x < -ServerParam::i().pitchHalfLength() + 8.0
-         && base_pos.absY() > ServerParam::i().goalHalfWidth() + 2.0 )
-    {
-        Vector2D target_point( base_move_x, ServerParam::i().goalHalfWidth() - 0.1 );
-        if ( base_pos.y < 0.0 )
-        {
-            target_point.y *= -1.0;
-        }
-
-        dlog.addText( Logger::TEAM,
-                      __FILE__": getTarget. target is goal pole" );
-        agent->debugClient().addMessage( "Pos(1)" );
-
-        return target_point;
-    }
-
-//---------------------------------------------------------//
-    {
-        const double x_back = 7.0; // tune this!!
-        int ball_pred_cycle = 5; // tune this!!
-        const double y_buf = 0.5; // tune this!!
-        const Vector2D base_point( - ServerParam::i().pitchHalfLength() - x_back,
-                                   0.0 );
-        Vector2D ball_point;
-        if ( wm.existKickableOpponent() )
-        {
-            ball_point = base_pos;
-            agent->debugClient().addMessage( "Pos(2)" );
-        }
-        else
-        {
-            int opp_min = wm.interceptTable()->opponentReachCycle();
-            if ( opp_min < ball_pred_cycle )
-            {
-                ball_pred_cycle = opp_min;
-                dlog.addText( Logger::TEAM,
-                              __FILE__": opp may reach near future. cycle = %d",
-                              opp_min );
-            }
-
-            ball_point
-                = inertia_n_step_point( base_pos,
-                                        wm.ball().vel(),
-                                        ball_pred_cycle,
-                                        ServerParam::i().ballDecay() );
-            agent->debugClient().addMessage( "Pos(3)" );
-        }
-
-        if ( ball_point.x < base_point.x + 0.1 )
-        {
-            ball_point.x = base_point.x + 0.1;
-        }
-
-        Line2D ball_line( ball_point, base_point );
-        double move_y = ball_line.getY( base_move_x );
-
-        if ( move_y > ServerParam::i().goalHalfWidth() - y_buf )
-        {
-            move_y = ServerParam::i().goalHalfWidth() - y_buf;
-        }
-        if ( move_y < - ServerParam::i().goalHalfWidth() + y_buf )
-        {
-            move_y = - ServerParam::i().goalHalfWidth() + y_buf;
-        }
-
-        return Vector2D( base_move_x, move_y );
-    }
 }
+
+// Vector2D
+// Bhv_GoalieBasicMove::getTargetPoint( PlayerAgent * agent )
+// {
+//     const double base_move_x = -49.8;
+//     const double danger_move_x = -51.5;
+//     const WorldModel & wm = agent->world();
+// 
+//     int ball_reach_step = 0;
+//     if ( ! wm.existKickableTeammate()
+//          && ! wm.existKickableOpponent() )
+//     {
+//         ball_reach_step
+//             = std::min( wm.interceptTable()->teammateReachCycle(),
+//                         wm.interceptTable()->opponentReachCycle() );
+//     }
+//     const Vector2D base_pos = wm.ball().inertiaPoint( ball_reach_step );
+// 
+// 
+//     //---------------------------------------------------------//
+//     // angle is very dangerous
+//     if ( base_pos.y > ServerParam::i().goalHalfWidth() + 3.0 )
+//     {
+//         Vector2D right_pole( - ServerParam::i().pitchHalfLength(),
+//                              ServerParam::i().goalHalfWidth() );
+//         AngleDeg angle_to_pole = ( right_pole - base_pos ).th();
+// 
+//         if ( -140.0 < angle_to_pole.degree()
+//              && angle_to_pole.degree() < -90.0 )
+//         {
+//             agent->debugClient().addMessage( "RPole" );
+//             return Vector2D( danger_move_x, ServerParam::i().goalHalfWidth() + 0.001 );
+//         }
+//     }
+//     else if ( base_pos.y < -ServerParam::i().goalHalfWidth() - 3.0 )
+//     {
+//         Vector2D left_pole( - ServerParam::i().pitchHalfLength(),
+//                             - ServerParam::i().goalHalfWidth() );
+//         AngleDeg angle_to_pole = ( left_pole - base_pos ).th();
+// 
+//         if ( 90.0 < angle_to_pole.degree()
+//              && angle_to_pole.degree() < 140.0 )
+//         {
+//             agent->debugClient().addMessage( "LPole" );
+//             return Vector2D( danger_move_x, - ServerParam::i().goalHalfWidth() - 0.001 );
+//         }
+//     }
+// 
+//     //---------------------------------------------------------//
+//     // ball is close to goal line
+//     if ( base_pos.x < -ServerParam::i().pitchHalfLength() + 8.0
+//          && base_pos.absY() > ServerParam::i().goalHalfWidth() + 2.0 )
+//     {
+//         Vector2D target_point( base_move_x, ServerParam::i().goalHalfWidth() - 0.1 );
+//         if ( base_pos.y < 0.0 )
+//         {
+//             target_point.y *= -1.0;
+//         }
+// 
+//         dlog.addText( Logger::TEAM,
+//                       __FILE__": getTarget. target is goal pole" );
+//         agent->debugClient().addMessage( "Pos(1)" );
+// 
+//         return target_point;
+//     }
+// 
+// //---------------------------------------------------------//
+//     {
+//         const double x_back = 7.0; // tune this!!
+//         int ball_pred_cycle = 5; // tune this!!
+//         const double y_buf = 0.5; // tune this!!
+//         const Vector2D base_point( - ServerParam::i().pitchHalfLength() - x_back,
+//                                    0.0 );
+//         Vector2D ball_point;
+//         if ( wm.existKickableOpponent() )
+//         {
+//             ball_point = base_pos;
+//             agent->debugClient().addMessage( "Pos(2)" );
+//         }
+//         else
+//         {
+//             int opp_min = wm.interceptTable()->opponentReachCycle();
+//             if ( opp_min < ball_pred_cycle )
+//             {
+//                 ball_pred_cycle = opp_min;
+//                 dlog.addText( Logger::TEAM,
+//                               __FILE__": opp may reach near future. cycle = %d",
+//                               opp_min );
+//             }
+// 
+//             ball_point
+//                 = inertia_n_step_point( base_pos,
+//                                         wm.ball().vel(),
+//                                         ball_pred_cycle,
+//                                         ServerParam::i().ballDecay() );
+//             agent->debugClient().addMessage( "Pos(3)" );
+//         }
+// 
+//         if ( ball_point.x < base_point.x + 0.1 )
+//         {
+//             ball_point.x = base_point.x + 0.1;
+//         }
+// 
+//         Line2D ball_line( ball_point, base_point );
+//         double move_y = ball_line.getY( base_move_x );
+// 
+//         if ( move_y > ServerParam::i().goalHalfWidth() - y_buf )
+//         {
+//             move_y = ServerParam::i().goalHalfWidth() - y_buf;
+//         }
+//         if ( move_y < - ServerParam::i().goalHalfWidth() + y_buf )
+//         {
+//             move_y = - ServerParam::i().goalHalfWidth() + y_buf;
+//         }
+// 
+//         return Vector2D( base_move_x, move_y );
+//     }
+// }
 

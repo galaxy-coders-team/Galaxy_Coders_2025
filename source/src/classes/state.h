@@ -35,10 +35,6 @@ public:
 
     Vector2D self_pos;
     Vector2D ball_pos;
-    Vector2D goal_pos;
-    Vector2D goal_r;
-    Vector2D goal_c;
-    Vector2D goal_l;
 
     double Angle_from_goal_r;
     double Angle_from_goal_c;

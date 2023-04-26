@@ -22,6 +22,7 @@
 #include <cmath>
 
 #include "matrix.h"
+#include "galaxy_ann.h"
 
 /**
  * @todo write docs
@@ -34,6 +35,7 @@ class galaxy_ann
     //Activation Functions
     double sigmoid(double input);
     double tanh(double input);
+    double liner(double input , double min , double max);
     matrix relu(matrix & input);
     int argmax_softmax(matrix & input);
     
@@ -50,5 +52,6 @@ public:
     std::vector<double> predict(std::vector<double> input);
     
 };
+
 
 #endif // GALAXY_ANN_H

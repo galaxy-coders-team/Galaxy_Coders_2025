@@ -141,3 +141,122 @@ std::vector<double> state::to_array()
 
     return array;
 }
+
+void goalie_state::get_state(rcsc::PlayerAgent* agent)
+{
+    const WorldModel &wm = agent->world();
+    Vector2D middle_goal_pos(52.5 , 0);
+
+    self_pos = wm.self().pos();
+    opp_pos = wm.getOpponentNearestToSelf(5,false)->pos();
+    ball_pos = wm.ball().pos();
+
+    Angle_from_self = wm.self().angleFromSelf().degree();
+    Angle_from_ball = wm.self().angleFromBall().degree();
+    
+    speed = wm.self().speed();
+
+    opp_dist_from_ball = ball_pos.dist(opp_pos);
+    dist_from_ball = ball_pos.dist(self_pos);
+    dist_from_center_goal = self_pos.dist(middle_goal_pos);
+
+    normalize_state();
+}
+
+void goalie_state::normalize_state()
+{
+    self_pos.x /= 52.5;
+    self_pos.y /= 34;
+
+    opp_pos.x /= 52.5;
+    opp_pos.y /= 34;
+
+    ball_pos.x /= 52.5;
+    ball_pos.y /= 34;
+
+    Angle_from_ball /= 180;
+    Angle_from_self /= 180;
+
+    dist_from_ball /= 125.09;
+    opp_dist_from_ball /= 125.09;
+    dist_from_center_goal /= 110.36;
+}
+void goalie_state::empty_state()
+{
+
+    self_pos.x = 0;
+    self_pos.y = 0;
+
+    ball_pos.x = 0;
+    ball_pos.y = 0;
+
+    opp_pos.x = 0;
+    opp_pos.y = 0;
+
+    ball_pos.x = 0;
+    ball_pos.y = 0;
+
+    Angle_from_ball = 0;
+    Angle_from_self = 0;
+
+    dist_from_ball = 0;
+    opp_dist_from_ball = 0;
+    dist_from_center_goal = 0;
+}
+
+void goalie_state::operator =(goalie_state state)
+{
+    self_pos = state.self_pos;
+    ball_pos = state.ball_pos;
+
+    Angle_from_self = state.Angle_from_self;
+    Angle_from_ball = state.Angle_from_ball ;
+
+    speed = state.speed;
+
+    opp_dist_from_ball = state.opp_dist_from_ball;
+    dist_from_ball = state.dist_from_ball;
+    dist_from_center_goal = state.dist_from_center_goal;
+
+}
+
+std::string goalie_state::to_string()
+{
+
+    std::string data = "";
+
+    data += std::to_string(self_pos.x            * 100) ; data += "," ;
+    data += std::to_string(self_pos.y            * 100) ; data += "," ;
+    data += std::to_string(ball_pos.x            * 100) ; data += "," ;
+    data += std::to_string(ball_pos.y            * 100) ; data += "," ;
+    data += std::to_string(opp_pos.x             * 100) ; data += "," ;
+    data += std::to_string(opp_pos.y             * 100) ; data += "," ;
+    data += std::to_string(Angle_from_self       * 100) ; data += "," ;
+    data += std::to_string(Angle_from_ball       * 100) ; data += "," ;
+    data += std::to_string(speed                 * 100) ; data += "," ;
+    data += std::to_string(opp_dist_from_ball    * 100) ; data += "," ;
+    data += std::to_string(dist_from_ball        * 100) ; data += "," ;
+    data += std::to_string(dist_from_center_goal * 100) ; data += "," ;
+
+    return data;
+}
+
+std::vector<double> goalie_state::to_array()
+{
+    std::vector<double> array
+    {
+        (double)self_pos.x ,(double)self_pos.y ,
+        (double)ball_pos.x ,(double)ball_pos.y ,
+        (double)opp_pos.x ,(double)opp_pos.y ,
+        (double)Angle_from_self ,(double)Angle_from_ball ,
+        (double)speed,
+        (double)opp_dist_from_ball ,(double)dist_from_ball, (double)dist_from_center_goal
+
+    };
+
+    state_dims = 12;
+
+    return array;
+}
+
+

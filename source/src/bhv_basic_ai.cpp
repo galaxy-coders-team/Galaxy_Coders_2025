@@ -206,3 +206,32 @@ ai_agent bhv_basic_ai::agent_data(rcsc::PlayerAgent* agent , std::string Path ,b
     
 }
 
+rcsc::Vector2D bhv_basic_ai::goalie_execute(rcsc::PlayerAgent* agent)
+{
+    const WorldModel & wm = agent->world();
+    rcsc::Vector2D output;
+    
+    state state;
+    state.get_state(agent);
+    
+    bool done = wm.gameMode().type() == rcsc::GameMode::PlayOn ? false : true ;
+    
+    if( agents[0].get_mem_counter() != 0)
+    {
+        agents[0].save_next_state(agent,state,done);
+    }
+    
+    if(done) {return output;}
+    
+    action action;
+    action = agents[0].take_action(state);
+    
+    output.x = action.direction * 52.5;
+    output.y = action.power * 34;
+    
+    agents[0].save_experience(state,action);
+    
+    return output;
+}
+
+

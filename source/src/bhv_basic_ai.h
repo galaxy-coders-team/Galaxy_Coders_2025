@@ -66,6 +66,7 @@ public:
     
       
     bool execute(rcsc::PlayerAgent * agent);
+    rcsc::Vector2D goalie_execute(rcsc::PlayerAgent * agent);
     
     bool do_action(rcsc::PlayerAgent* agent , action action,int Last_kick_time);
     

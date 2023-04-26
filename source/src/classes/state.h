@@ -63,4 +63,35 @@ public:
     
 };
 
+class goalie_state
+{
+    public:
+    
+    uint32_t state_dims = 12;
+
+    Vector2D self_pos;
+    Vector2D opp_pos;
+    Vector2D ball_pos;
+
+    double Angle_from_self;
+    double Angle_from_ball;
+    
+    double speed;
+
+    double opp_dist_from_ball;
+    double dist_from_ball;
+    double dist_from_center_goal;
+    
+    void get_state(rcsc::PlayerAgent * agent);
+    void empty_state();
+    
+    void operator=(goalie_state state);
+   
+    void normalize_state();
+   
+    std::vector<double> to_array();
+    
+    std::string to_string();
+};
+
 #endif // STATE_H

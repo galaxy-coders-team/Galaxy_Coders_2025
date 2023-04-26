@@ -45,7 +45,7 @@ double reward_calculator::ball_distance_change(state State, state New_state)
 
 double reward_calculator::goal_distance_change(state State, state New_state)
 {
-    double reward = New_state.dist_from_goal - State.dist_from_goal;
+    double reward = New_state.dist_from_goal_c - State.dist_from_goal_c;
     reward *= goal_distance_change_factor;
     return reward;
 }

@@ -31,36 +31,34 @@ class state
 {
 public:
     
-    uint32_t state_dims = 57;
+    uint32_t state_dims = 17;
 
     Vector2D self_pos;
     Vector2D ball_pos;
     Vector2D goal_pos;
+    Vector2D goal_r;
+    Vector2D goal_c;
+    Vector2D goal_l;
 
-    double Angle_from_goal;
+    double Angle_from_goal_r;
+    double Angle_from_goal_c;
+    double Angle_from_goal_l;
     double Angle_from_ball;
-    
-    double speed;
-    double stamina;
-    double stamina_capacity;
 
     double dist_from_ball;
-    double dist_from_goal;
-    
-    bool is_kickable;
-    bool is_tacklable;
-    bool exist_kickable_teammate;
+    double dist_from_goal_r;
+    double dist_from_goal_c;
+    double dist_from_goal_l;
 
-    Vector2D tm_pos[10];
-    Vector2D opp_pos[11];
     
     
     void get_state(rcsc::PlayerAgent * agent);
+
     void empty_state();
     
-   void operator =(state s);
+    void operator =(state s);
    
-   void normalize_state();
+    void normalize_state();
    
    std::vector<double> to_array();
    

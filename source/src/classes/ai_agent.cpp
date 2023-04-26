@@ -129,7 +129,7 @@ action ai_agent::take_action(state State)
         random_num = get_random_num(0,1,false); // generate random number between 0 and 1
     }
     
-     int action_type = State.is_kickable ? 0 : 1;
+     int action_type = 1 ? 0 : 1;
      double direction = 0;
      double power = 0;
      

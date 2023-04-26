@@ -68,7 +68,7 @@ Bhv_GoalieBasicMove::execute( PlayerAgent * agent )
     int mate_min = wm.interceptTable()->teammateReachCycle();
     int opp_min = wm.interceptTable()->opponentReachCycle();
 
-    const Vector2D move_point = getTargetPoint( agent );
+    const Vector2D move_point = getTargetPoint( agent ); // changes to ai
 
     dlog.addText( Logger::TEAM,
                   __FILE__": Bhv_GoalieBasicMove. move_point(%.2f %.2f)",
@@ -87,8 +87,11 @@ Bhv_GoalieBasicMove::execute( PlayerAgent * agent )
         Body_Intercept2009().execute(agent);
         return true;
     }
+    
+    //if(wm.self().pos().dist(move_point) > 1){
     if (!Body_GoToPoint2010(move_point,1.0,100).execute(agent))
         Body_TurnToPoint(move_point).execute(agent);
+    //}
 
     return true;
 }

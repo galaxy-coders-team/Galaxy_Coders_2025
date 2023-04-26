@@ -109,23 +109,148 @@ Bhv_BasicOffensiveKick::execute( PlayerAgent * agent )
     return true;
 }
 
-bool Bhv_BasicOffensiveKick::shoot( rcsc::PlayerAgent * agent ){
-	const WorldModel & wm = agent->world();
-	Vector2D ball_pos = wm.ball().pos();
-	Vector2D center_goal = Vector2D(52.5,0);
-	if(ball_pos.dist(center_goal) > 25)
-            return false;
-	Vector2D left_goal = Vector2D(52.5,6);
-	Vector2D right_goal = Vector2D(52.5,-6);
+bool Bhv_BasicOffensiveKick::shoot( rcsc::PlayerAgent * agent )
+{
+    const WorldModel & wm = agent->world();
+    Vector2D ball_pos = wm.ball().pos();
+    Vector2D leftpos[7],rightpos[7];
+    double y=-6;
+    if(ball_pos.x<35)
+    {
+        return false;
+    }
+    for(int i=1;i<=6;++i)
+    {
+        leftpos[i].assign(52.5,y);
+        ++y;
+    }
+    y=6;
+    for(int i=1;i<=6;++i)
+    {
+        rightpos[i].assign(52.5,y);
+        --y;
+    }
+    if(ball_pos.y<0)
+    {
+        for(int i=1;i<=6;++i)
+        {
+            for(double s=2.7;s>2.2;s=s-0.1)
+            {
+                if(safepathshoot(agent,leftpos[i],s))
+                {
+                    return Body_SmartKick(leftpos[i],s,s,3).execute(agent); 
+                }        
+            }          
+        }
+        for(int i=1;i<=6;++i)
+        {
+            for(double s=2.7;s>2.2;s=s-0.1)
+            {
+                if(safepathshoot(agent,rightpos[i],s))
+                {
+                    return Body_SmartKick(rightpos[i],s,s,3).execute(agent); 
+                }        
+            }          
+        }
+    }
+    else
+    {
+        for(int i=1;i<=6;++i)
+        {
+            for(double s=2.7;s>2.2;s=s-0.1)
+            {
+                if(safepath(agent,rightpos[i],s))
+                {
+                    return Body_SmartKick(rightpos[i],s,s,3).execute(agent); 
+                }        
+            }          
+        }
+        for(int i=1;i<=6;++i)
+        {
+            for(double s=2.7;s>2.2;s=s-0.1)
+            {
+                if(safepath(agent,leftpos[i],s))
+                {
+                    return Body_SmartKick(leftpos[i],s,s,3).execute(agent); 
+                }        
+            }          
+        }
+    }
+    return false;
 
-	if(left_goal.dist(ball_pos) < right_goal.dist(ball_pos)){
-        Body_SmartKick(left_goal,3,0.1,2).execute(agent);
-	}else{
-        Body_SmartKick(right_goal,3,0.1,2).execute(agent);
-	}
-	return true;
+}
+bool Bhv_BasicOffensiveKick::safepath(rcsc::PlayerAgent* agent, rcsc::Vector2D target, double s)
+{
+    const WorldModel &wm=agent->world();
+    Vector2D ball_pos=wm.ball().pos();
+    AngleDeg an=(target-ball_pos).th();
+    Vector2D pos_vel=Vector2D::polar2vector(s,an),n_pos;
+    double distop,disttm;
+    for(int i=1;i<=ball_step2(agent,target,s);++i)
+    {
+        n_pos=inertia_n_step_point(ball_pos,pos_vel,i,ServerParam::i().ballDecay());
+        
+        distop=wm.getDistOpponentNearestTo(n_pos,5);
+        disttm=wm.getDistTeammateNearestTo(n_pos,5);
+        if(distop<i+1)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
+int Bhv_BasicOffensiveKick::ball_step2(PlayerAgent* agent,Vector2D tm_pos,double sp)
+{
+    const WorldModel &wm=agent->world();
+    Vector2D ball_pos=wm.ball().pos();
+    Vector2D v1,v2,pos_vel;
+    AngleDeg t=(tm_pos-ball_pos).th();
+    bool w=true;
+    double dist1,dist2;
+    int i=1;
+    pos_vel=Vector2D::polar2vector(sp,t);
+    v1=inertia_n_step_point(ball_pos,pos_vel,i,ServerParam::i().ballDecay());
+    v2=inertia_n_step_point(ball_pos,pos_vel,i+1,ServerParam::i().ballDecay());
+    dist1=v1.dist(tm_pos);
+    dist2=v2.dist(tm_pos);
+    while(dist2<dist1 && i<20)
+    {
+        if(dist2<0.3)
+        {
+                return i+1;
+        }
+            ++i;
+            v1=inertia_n_step_point(ball_pos,pos_vel,i,ServerParam::i().ballDecay());
+            v2=inertia_n_step_point(ball_pos,pos_vel,i+1,ServerParam::i().ballDecay());
+            dist1=v1.dist(tm_pos);
+            dist2=v2.dist(tm_pos);
+    }
+    return i;
+}
+
+bool Bhv_BasicOffensiveKick::safepathshoot(rcsc::PlayerAgent* agent, rcsc::Vector2D target, double s)
+{
+    const WorldModel &wm=agent->world();
+    Vector2D ball_pos=wm.ball().pos();
+    AngleDeg an=(target-ball_pos).th();
+    Vector2D pos_vel=Vector2D::polar2vector(s,an),n_pos;
+    double distop,disttm;
+    int step=ball_step2(agent,target,s);
+    for(int i=1;i<=step;++i)
+    {
+        n_pos=inertia_n_step_point(ball_pos,pos_vel,i,ServerParam::i().ballDecay());
+        
+        distop=wm.getDistOpponentNearestTo(n_pos,5);
+        disttm=wm.getDistTeammateNearestTo(n_pos,5);
+        if(distop<i)
+        {
+            return false;
+        }
+    }
+    //agent->debugClient().addCircle(n_pos,3);
+    return true;
+}
 
 bool Bhv_BasicOffensiveKick::perfectShoot( rcsc::PlayerAgent * agent ){
 

@@ -43,6 +43,9 @@ public:
     bool dribble( rcsc::PlayerAgent * agent );
     bool clearball( rcsc::PlayerAgent * agent );
     bool perfectShoot( rcsc::PlayerAgent * agent );
+    int ball_step2(rcsc::PlayerAgent* agent,rcsc::Vector2D tm_pos,double sp);
+    bool safepathshoot(rcsc::PlayerAgent* agent, rcsc::Vector2D target, double s);
+    bool safepath(rcsc::PlayerAgent* agent, rcsc::Vector2D target, double s);
 };
 
 #endif

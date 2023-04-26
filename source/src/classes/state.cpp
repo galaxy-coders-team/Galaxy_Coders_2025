@@ -328,7 +328,7 @@ void goalie_state::empty_state()
     dist_from_center_goal = 0;
 }
 
-void goalie_state::operator=(goalie_state state)
+void goalie_state::operator =(goalie_state state)
 {
     self_pos = state.self_pos;
     ball_pos = state.ball_pos;

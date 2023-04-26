@@ -91,7 +91,7 @@ class goalie_state
     void get_state(rcsc::PlayerAgent * agent);
     void empty_state();
     
-    void operator =(goalie_state s);
+    void operator=(goalie_state state);
    
     void normalize_state();
    

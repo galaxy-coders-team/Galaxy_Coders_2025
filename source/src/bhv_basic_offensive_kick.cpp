@@ -35,6 +35,7 @@
 #endif
 
 #include "bhv_basic_offensive_kick.h"
+#include "bhv_basic_ai.h"
 
 #include <rcsc/action/body_hold_ball.h>
 #include <rcsc/action/body_smart_kick.h>
@@ -50,6 +51,7 @@
 #include <vector>
 
 #include "classes/ai_agent.h"
+#include "bhv_basic_ai.h"
 using namespace rcsc;
 
 /*-------------------------------------------------------------------*/
@@ -252,125 +254,6 @@ bool Bhv_BasicOffensiveKick::safepathshoot(rcsc::PlayerAgent* agent, rcsc::Vecto
     return true;
 }
 
-bool Bhv_BasicOffensiveKick::perfectShoot( rcsc::PlayerAgent * agent ){
-
-    const WorldModel & wm = agent->world();
-	Vector2D ball_pos = wm.ball().pos();
-    Vector2D center_goal = Vector2D(52.5,0);
-	if(ball_pos.dist(center_goal) > 16)
-        return false;
-    if ( ball_pos.y<-15 || ball_pos.y>15 )
-        return false;
-    Vector2D g1 = Vector2D(52.5 , 6) , g2 = Vector2D(52.5 , 5) , g3 = Vector2D(52.5 , 2) , g4 = center_goal , g5 = Vector2D(52.5 , -2) ;
-    Vector2D g6 = Vector2D(52.5 , -5) , g7 = Vector2D(52.5 , -6);
-
-
-    double dist[7];
-
-    double d1 = ball_pos.dist(g1);
-    double d2 = ball_pos.dist(g2);
-    double d3 = ball_pos.dist(g3);
-    double d4 = ball_pos.dist(g4);
-    double d5 = ball_pos.dist(g5);
-    double d6 = ball_pos.dist(g6);
-    double d7 = ball_pos.dist(g7);
-
-    dist[0] = d1 ;
-    dist[1] = d2 ;
-    dist[2] = d3 ;
-    dist[3] = d4 ;
-    dist[4] = d5 ;
-    dist[5] = d6 ;
-    dist[6] = d7 ;
-
-
-    const AbstractPlayerObject * golieopp = wm.theirPlayer(wm.theirGoalieUnum());
-    Vector2D gopp = golieopp->pos();
-
-    double gdist[7];
-    double gd1 = gopp.dist(g1);
-    double gd2 = gopp.dist(g2);
-    double gd3 = gopp.dist(g3);
-    double gd4 = gopp.dist(g4);
-    double gd5 = gopp.dist(g5);
-    double gd6 = gopp.dist(g6);
-    double gd7 = gopp.dist(g7);
-
-    gdist[0] = gd1;
-    gdist[1] = gd2;
-    gdist[2] = gd3;
-    gdist[3] = gd4;
-    gdist[4] = gd5;
-    gdist[5] = gd6;
-    gdist[6] = gd7;
-
-    double lasDist = d1;
-
-    for (int i = 0 ; i<7 ; i++)
-    {
-
-        for (int j = 0 ; j<7 ; j++)
-        {
-
-            if ( gdist[i]*1.5 > dist[j] && dist[j] < lasDist && j != 0)
-            {
-
-                lasDist = dist[j];
-
-            }
-
-        }
-
-    }
-
-
-
-    if (lasDist == d1 )
-    {
-
-        Body_SmartKick(g1,3,0.1,2).execute(agent);
-
-    }
-    else if (lasDist == d2 )
-    {
-
-        Body_SmartKick(g2,3,0.1,2).execute(agent);
-
-    }
-    else if (lasDist == d3 )
-    {
-
-        Body_SmartKick(g3,3,0.1,2).execute(agent);
-
-    }
-    else if (lasDist == d4 )
-    {
-
-        Body_SmartKick(g4,3,0.1,2).execute(agent);
-
-    }
-    else if (lasDist == d5 )
-    {
-
-        Body_SmartKick(g5,3,0.1,2).execute(agent);
-
-    }
-    else if (lasDist == d6 )
-    {
-
-        Body_SmartKick(g6,3,0.1,2).execute(agent);
-
-    }
-    else if (lasDist == d7 )
-    {
-
-        Body_SmartKick(g7,3,0.1,2).execute(agent);
-
-    }
-    return true;
-
-
-}
 
 bool Bhv_BasicOffensiveKick::pass(PlayerAgent * agent){
 	const WorldModel & wm = agent->world();
@@ -402,18 +285,21 @@ bool Bhv_BasicOffensiveKick::pass(PlayerAgent * agent){
 	return true;
 }
 
-bool Bhv_BasicOffensiveKick::dribble(PlayerAgent * agent){
-	const WorldModel & wm = agent->world();
-	Vector2D ball_pos = wm.ball().pos();
-	double dribble_angle = (Vector2D(52.5,0) - ball_pos).th().degree();
-	Sector2D dribble_sector = Sector2D(ball_pos,0,3,dribble_angle - 15,dribble_angle+15);
-	if(!wm.existOpponentIn(dribble_sector,5,true)){
-		Vector2D target = Vector2D::polar2vector(3,dribble_angle) + ball_pos;
-		if(Body_SmartKick(target,0.8,0.7,2).execute(agent)){
-			return true;
-		}
-	}
-	return false;
+bool Bhv_BasicOffensiveKick::dribble(PlayerAgent * agent)
+{
+// 	const WorldModel & wm = agent->world();
+// 	Vector2D ball_pos = wm.ball().pos();
+// 	double dribble_angle = (Vector2D(52.5,0) - ball_pos).th().degree();
+// 	Sector2D dribble_sector = Sector2D(ball_pos,0,3,dribble_angle - 15,dribble_angle+15);
+// 	if(!wm.existOpponentIn(dribble_sector,5,true)){
+// 		Vector2D target = Vector2D::polar2vector(3,dribble_angle) + ball_pos;
+// 		if(Body_SmartKick(target,0.8,0.7,2).execute(agent)){
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+    double direction = bhv_basic_ai().penalty_execute(agent);
+    return agent->doKick(direction , 0.2 );
 }
 
 bool Bhv_BasicOffensiveKick::clearball(PlayerAgent * agent){

@@ -67,6 +67,7 @@ public:
       
     bool execute(rcsc::PlayerAgent * agent);
     rcsc::Vector2D goalie_execute(rcsc::PlayerAgent * agent);
+    double penalty_execute(rcsc::PlayerAgent * agent);
     
     bool do_action(rcsc::PlayerAgent* agent , action action,int Last_kick_time);
     
@@ -78,8 +79,6 @@ public:
     ai_agent agent_data(rcsc::PlayerAgent * agent, std::string Path ,bool Learn_mode, bool Read_from_file);
     
     void goal(rcsc::PlayerAgent* agent );
-
-    int load_unum(std::string path);
     
     
 };

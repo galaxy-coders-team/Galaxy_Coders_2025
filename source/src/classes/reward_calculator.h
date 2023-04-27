@@ -30,7 +30,6 @@ class reward_calculator
 {   
     bool isGoaler = false; // goaler reward method is different so we use this parametr to see wich method we have to use
     
-    double kick_reward = 10;
     
     double ball_distance_change_factor = 1;
     double goal_distance_change_factor = 1;
@@ -38,11 +37,11 @@ class reward_calculator
     
     double ball_distance_change(state State,state New_state);
     double goal_distance_change(state State,state New_state);
-    double is_kick(rcsc::PlayerAgent * agent,action action);
     double distanc_from_playgrand_edge(state New_state);
   
 public:
-    double goal_score = 400;
+    
+    double goal_score = 100;
      
     void get_params(bool IsGoaler);  // set the reward_calculator prams
     double reward(rcsc::PlayerAgent * agent , state State,action Actio,state New_state); // calculat reward white agent_state and new_state

@@ -25,14 +25,24 @@ void reward_calculator::get_params(bool IsGoaler)
 
 double reward_calculator::reward(rcsc::PlayerAgent * agent , state State , action Action , state New_state)
 {
-    double Reward = 0;
-    
-    // reward main method
-    Reward += ball_distance_change(State,New_state);
-    Reward += goal_distance_change(State,New_state);
-    Reward += is_kick(agent,Action);
-    Reward -= distanc_from_playgrand_edge(New_state);
-        
+        double Reward = 0;
+    if(isGoaler == false)
+    {
+        // reward main method
+        Reward += ball_distance_change(State,New_state);
+        Reward += goal_distance_change(State,New_state);
+        Reward -= distanc_from_playgrand_edge(New_state);
+    }
+    else
+    {
+     //   if
+  //          ((agent->world().gameMode().type() == GameMode::PenaltyMiss_ && agent->world().gameMode().side() != agent->world().ourSide()) ||
+       //         a
+        //    )
+       // {
+            
+        }
+    }
     return Reward;
 }
 
@@ -47,18 +57,6 @@ double reward_calculator::goal_distance_change(state State, state New_state)
 {
     double reward = New_state.dist_from_goal_c - State.dist_from_goal_c;
     reward *= goal_distance_change_factor;
-    return reward;
-}
-
-double reward_calculator::is_kick(rcsc::PlayerAgent * agent,action action)
-{
-    double reward = 0 ;
-    
-    if(action.action_type == 0 && bhv_basic_ai().last_kicker_unum == agent->world().self().unum())
-    {
-        reward = kick_reward;
-    }
-    
     return reward;
 }
 

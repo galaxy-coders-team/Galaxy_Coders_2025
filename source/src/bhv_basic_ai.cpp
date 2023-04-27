@@ -72,14 +72,23 @@ void bhv_basic_ai::load_agent(rcsc::PlayerAgent* agent , bool Learn_mode , bool 
 {
     const WorldModel & wm = agent->world();
     
-    if(agents[wm.self().unum()].is_loaded){ return; }
-    
-    std::string Name = name[wm.self().unum() - 1] , path = "team_data/";
-
-    if(wm.self().unum() ==5)
+    int unum = 1;
+    if(wm.gameMode().type() == GameMode::PenaltyKick_)
     {
-        SamplePlayer().s.assign(agents[wm.self().unum()].get_random_num(-50,-10,false),agents[wm.self().unum()].get_random_num(-30,30,false));
+        if(wm.self().unum() != 1)
+        {
+            unum = 5;
+        }
     }
+    else
+    {
+        unum = wm.self().unum();
+    }
+    if(agents[unum].is_loaded){ return; }
+    
+    std::string Name = name[unum - 1] , path = "team_data/";
+
+    
 
     if(Learn_mode)
     {
@@ -92,21 +101,21 @@ void bhv_basic_ai::load_agent(rcsc::PlayerAgent* agent , bool Learn_mode , bool 
 
     if(Read_from_file)
     {
-        if(agents[wm.self().unum()].load_agent(agent , path , Name , Learn_mode) == false)
+        if(agents[unum].load_agent(agent , path , Name , Learn_mode) == false)
         {
-            agents[wm.self().unum()] = agent_data(agent,path,Learn_mode,false);
+            agents[unum] = agent_data(agent,path,Learn_mode,false);
         }
     }
     else
     {
-        agents[wm.self().unum()] = agent_data(agent,path ,Learn_mode, false);
+        agents[unum] = agent_data(agent,path ,Learn_mode, false);
     }
     
-    agents[wm.self().unum()].learn_mode = Learn_mode;
+    agents[unum].learn_mode = Learn_mode;
     
     
     
-    std::cout<<"\n agent {" << wm.self().unum() << "} " << Name <<"\n";
+    std::cout<<"\n agent {" << unum << "} " << Name <<"\n";
     
 }
 
@@ -233,5 +242,35 @@ rcsc::Vector2D bhv_basic_ai::goalie_execute(rcsc::PlayerAgent* agent)
     
     return output;
 }
+
+double bhv_basic_ai::penalty_execute(rcsc::PlayerAgent* agent)
+{
+    const WorldModel & wm = agent->world();
+    double output = 0;
+    
+    state state;
+    state.get_state(agent);
+    
+    bool done = wm.gameMode().type() == rcsc::GameMode::PlayOn ? false : true ;
+    
+    if( agents[4].get_mem_counter() != 0)
+    {
+        agents[4].save_next_state(agent,state,done);
+    }
+    
+    if(done) {return output;}
+    
+    action action;
+    action = agents[4].take_action(state);
+    
+    output = action.direction * 180;
+    
+    agents[4].save_experience(state,action);
+    
+    return output;
+}
+
+
+
 
 

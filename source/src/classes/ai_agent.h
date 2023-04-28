@@ -102,7 +102,7 @@ public:
     
     void save_memory_file(); // save the game experience (agent replay bufer) in .csv file
     
-    void load_model();
+    void load_model(rcsc::PlayerAgent * agent);
     
     std::string to_string(); // write agent params in .csv file
     
@@ -121,6 +121,10 @@ public:
     void change_save_mode();
 
     double get_random_num(int min_num , int max_num , bool integer_output);
+
+    void clear_memory();
+
+
     
 };
 

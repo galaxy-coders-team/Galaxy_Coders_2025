@@ -68,9 +68,7 @@ Bhv_BasicOffensiveKick::execute( PlayerAgent * agent )
     const WorldModel & wm = agent->world();
 
     
-    if(perfectShoot(agent)){
-    	return true;
-    }
+
     
     if(shoot(agent)){
     	return true;

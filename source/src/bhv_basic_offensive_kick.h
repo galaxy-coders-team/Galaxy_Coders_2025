@@ -29,6 +29,18 @@
 
 #include <rcsc/player/soccer_action.h>
 
+#include <rcsc/action/body_hold_ball.h>
+#include <rcsc/action/body_smart_kick.h>
+#include <rcsc/action/body_stop_ball.h>
+#include <rcsc/player/player_agent.h>
+#include <rcsc/player/debug_client.h>
+
+#include <rcsc/common/logger.h>
+#include <rcsc/common/server_param.h>
+
+#include <rcsc/geom/sector_2d.h>
+
+#include <vector>
 
 class Bhv_BasicOffensiveKick
     : public rcsc::SoccerBehavior {
@@ -43,7 +55,7 @@ public:
     bool dribble( rcsc::PlayerAgent * agent );
     bool clearball( rcsc::PlayerAgent * agent );
     bool perfectShoot( rcsc::PlayerAgent * agent );
-    int ball_step2(rcsc::PlayerAgent* agent,rcsc::Vector2D tm_pos,double sp);
+    int  ball_step2(rcsc::PlayerAgent* agent,    rcsc::Vector2D tm_pos,double sp);
     bool safepathshoot(rcsc::PlayerAgent* agent, rcsc::Vector2D target, double s);
     bool safepath(rcsc::PlayerAgent* agent, rcsc::Vector2D target, double s);
 };

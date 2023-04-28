@@ -245,6 +245,11 @@ rcsc::Vector2D bhv_basic_ai::goalie_execute(rcsc::PlayerAgent* agent)
 
 double bhv_basic_ai::penalty_execute(rcsc::PlayerAgent* agent)
 {
+    if(agents[0].get_mem_counter() >= 640)
+    {
+        agents[0].save_memory_file();
+        agents[0].clear_memmory();
+    }
     const WorldModel & wm = agent->world();
     double output = 0;
     

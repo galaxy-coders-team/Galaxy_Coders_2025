@@ -485,11 +485,6 @@ SamplePlayer::doPreprocess()
             
         }
         
-        if(wm.self().unum() != 1 && wm.time().cycle() > 4000)
-        {
-            bhv_basic_ai().save_agent(this);
-        }
-        
 
 
 
@@ -513,12 +508,15 @@ SamplePlayer::doPreprocess()
         Bhv_CustomBeforeKickOff( move_point ).execute( this );
         return true;
     }
-    
-    if(wm.self().unum() != 1 && wm.time().cycle() > 5000)
+    if(wm.gameMode().type() == GameMode::PenaltyMiss_)
+    {
+        if(wm.self().unum() == wm.ourGoalieUnum())
         {
-            bhv_basic_ai().save_agent(this);
+            bhv_basic_ai().goalie_execute(this);
         }
-    
+        else
+        { bhv_basic_ai().penalty_execute(this); }
+    }
     if(wm.gameMode().type() == GameMode::FreeKick_ && wm.self().unum() != 1 && wm.time().cycle() > 1)
     {
         bhv_basic_ai().save_agent(this);

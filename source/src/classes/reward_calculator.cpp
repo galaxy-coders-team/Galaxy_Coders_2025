@@ -35,13 +35,18 @@ double reward_calculator::reward(rcsc::PlayerAgent * agent , state State , actio
     }
     else
     {
-     //   if
-  //          ((agent->world().gameMode().type() == GameMode::PenaltyMiss_ && agent->world().gameMode().side() != agent->world().ourSide()) ||
-       //         a
-        //    )
-       // {
-            
+        if
+            ((agent->world().gameMode().type() == GameMode::PenaltyMiss_ && agent->world().gameMode().side() != agent->world().ourSide()) )
+        {
+            Reward = 1;
         }
+        else if(
+            (agent->world().gameMode().type() == GameMode::PenaltyScore_ &&
+                 agent->world().gameMode().side() != agent->world().ourSide(
+            )))
+            {
+                Reward = -1;
+            }
     }
     return Reward;
 }

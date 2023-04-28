@@ -89,7 +89,7 @@ void ai_agent::get_params(std::string Name, rcsc::PlayerAgent* agent, std::strin
     
     if(use_model)
     {
-        load_model();
+        load_model(agent);
     }
     
     is_loaded = true;
@@ -334,7 +334,7 @@ bool ai_agent::load_agent(rcsc::PlayerAgent * agent , std::string Path, std::str
     bool isGoaler = wm.self().unum() == wm.ourGoalieUnum() ? true : false ; // get our agent type to set the reward method
     reward.get_params(isGoaler); // set the reward params
     
-    load_model();
+    load_model(agent);
     
     use_model = true;
     is_loaded = true;
@@ -345,13 +345,14 @@ bool ai_agent::load_agent(rcsc::PlayerAgent * agent , std::string Path, std::str
 }
 
 
-void ai_agent::load_model()
+void ai_agent::load_model(rcsc::PlayerAgent * agent)
 {
     state s;
     uint32_t input_dims = s.state_dims;
     std::vector<uint32_t> model_shape = { input_dims ,400,300,200};
-    
-    model.get_param(model_shape , path + "models_weights/" + name + "_");
+    bool is_goaler = agent->world().self().unum() == agent->world().ourGoalieUnum();
+
+    model.get_param(model_shape , path + "models_weights/" + name + "_" , is_goaler);
 }
 
 
@@ -415,6 +416,12 @@ void ai_agent::change_save_mode()
     if(is_saved == true)
     { is_saved = false; }
 }
+
+void ai_agent::clear_memory()
+{
+    agent_memory.mem
+}
+
 
 
 

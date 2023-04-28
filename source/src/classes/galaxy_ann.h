@@ -32,6 +32,8 @@ class galaxy_ann
     matrix base(matrix& input);
     std::vector<double> action_output(matrix & base);
     
+    bool is_goaler = false;
+
     //Activation Functions
     double sigmoid(double input);
     double tanh(double input);
@@ -45,7 +47,7 @@ public:
     std::vector<matrix>  _weightMatrices;
     std::vector<matrix>  _biasMatrices;
     
-    void get_param(std::vector<uint32_t> topology ,std::string main_path);
+    void get_param(std::vector<uint32_t> topology ,std::string main_path , bool Is_goaler);
     
     void read_weight(std::string path);
     

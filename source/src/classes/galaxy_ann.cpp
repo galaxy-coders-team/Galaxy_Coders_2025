@@ -19,11 +19,13 @@
 #include <iostream>
 #include <boost/mpl/max_element.hpp>
 
-void galaxy_ann::get_param(std::vector<uint32_t> topology, std::string main_path)
+void galaxy_ann::get_param(std::vector<uint32_t> topology, std::string main_path ,bool Is_goaler)
 {
     _topology = topology;
     
     uint32_t i;
+
+    is_goaler = Is_goaler;
     
     _biasMatrices.clear();
     _biasMatrices.clear();
@@ -42,27 +44,43 @@ void galaxy_ann::get_param(std::vector<uint32_t> topology, std::string main_path
    
     }
     
-    i = topology.size() - 1;
-    //direction
-    matrix direction_weigh(1,topology[topology.size() - 1]);
-    matrix direction_bias(1 ,1);
+    if(Is_goaler)
+    {
+        i = topology.size() - 1;
+        //direction
+        matrix direction_weigh(1,topology[topology.size() - 1]);
+        matrix direction_bias(1 ,1);
     
-    direction_weigh = direction_weigh.read_from_file(main_path +  std::to_string(i) + "_weights.csv");
-    direction_bias = direction_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
+        direction_weigh = direction_weigh.read_from_file(main_path +  std::to_string(i) + "_weights.csv");
+        direction_bias = direction_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
     
-    _weightMatrices.push_back(direction_weigh);
-    _biasMatrices.push_back(direction_bias);
+        _weightMatrices.push_back(direction_weigh);
+        _biasMatrices.push_back(direction_bias);
+
+        i += 1;
+        //power
+        matrix power_weigh(1 ,topology[topology.size() - 1]);
+        matrix power_bias(1 ,1);
     
-    i += 1;
-    //power
-    matrix power_weigh(1 ,topology[topology.size() - 1]);
-    matrix power_bias(1 ,1);
+        power_weigh = power_weigh.read_from_file(main_path +  std::to_string(i) + "_weights.csv");
+        power_bias = power_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
     
-    power_weigh = power_weigh.read_from_file(main_path +  std::to_string(i) + "_weights.csv");
-    power_bias = power_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
-    
-    _weightMatrices.push_back(power_weigh);
-    _biasMatrices.push_back(power_bias);
+        _weightMatrices.push_back(power_weigh);
+        _biasMatrices.push_back(power_bias);
+    }
+    else
+    {
+        i = topology.size() - 1;
+        //direction
+        matrix direction_weigh(1,topology[topology.size() - 1]);
+        matrix direction_bias(1 ,1);
+
+        direction_weigh = direction_weigh.read_from_file(main_path +  std::to_string(i) + "_weights.csv");
+        direction_bias = direction_bias.read_from_file(main_path + std::to_string(i) + "_bias.csv").transpose();
+
+        _weightMatrices.push_back(direction_weigh);
+        _biasMatrices.push_back(direction_bias);
+    }
     
     
     //std::cout.precision(8);
@@ -91,18 +109,28 @@ std::vector<double> galaxy_ann::action_output(matrix& base)
     
     int index = _weightMatrices.size() - 2;
     matrix x;
-    
+    if(is_goaler)
+    {
     x = base.multiply( _weightMatrices[index] );
     x = x.add(_biasMatrices[index]);
     
-    values.push_back( tanh(x.at(0,0)) ) ;
+    values.push_back( liner(x.at(0,0) , -1 , 1) ) ;
     
     x = base.multiply( _weightMatrices[index + 1] );
     x = x.add(_biasMatrices[index + 1]);
     
-    values.push_back( sigmoid(x.at(0,0)));
+    values.push_back( liner(x.at(0,0) , -1 , 1) ) ;
     
     return values; 
+    }
+    else
+    {
+        x = base.multiply( _weightMatrices[index] );
+        x = x.add(_biasMatrices[index]);
+
+        values.push_back( liner(x.at(0,0) , -180 , 180) ) ;
+        return values;
+    }
 }
 
 
@@ -179,7 +207,15 @@ int galaxy_ann::argmax_softmax(matrix& input)
 
 double galaxy_ann::liner(double input, double min, double max)
 {
-    
+    if(input >= max)
+    {
+        return max;
+    }
+    else if(input <= min)
+    {
+        return min;
+    }
+    return input;
 }
 
 
